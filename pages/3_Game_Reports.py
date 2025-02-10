@@ -1,14 +1,16 @@
 import streamlit as st
-
+import plotly.express as px
+import pandas as pd
 from PIL import Image
 
+from utils import court_coordinates as cc
 
-class Dashboard:
+
+class GameStatisticsDashboard:
     def __init__(self):
-        favicon = Image.open("./assests/basketball.png")
-        st.set_page_config(page_title="BWB Team Statistics", page_icon=favicon, layout="wide")
+        st.set_page_config(layout="wide")
 
-    def create_streamlit(self):
+    def create_sidebar(self):
         # Sidebar
         with st.sidebar:
             options = [
@@ -35,29 +37,39 @@ class Dashboard:
             ]
             selected_option = st.sidebar.selectbox("Game", options)
 
-        with st.sidebar:
-            options = [
-                "Team Overall",
-                "David",
-                "Noel",
-                "Josh",
-                "Jake",
-                "John",
-                "James",
-                "Marcus",
-                "Ricky",
-                "Harry",
-                "Jeff",
-            ]
-            selected_option = st.sidebar.selectbox("Player", options)
+    def build_court(self):
+        court_container = st.container(border=True)
+        with court_container:
+            court = cc.CourtCoordinates()
+            court_lines_df = court.get_court_lines()
+            fig = px.line_3d(
+                data_frame=court_lines_df,
+                x='x',
+                y='y',
+                z='z',
+                line_group='line_group',
+                color='color',
+                color_discrete_map={
+                           'court': '#fff',
+                           'hoop': '#e47041'
+                },
+                markers=False,
+            )
+            # Remove axis values
+            fig.update_traces(hovertemplate=None, hoverinfo='skip', showlegend=False)
+            fig.update_xaxes(visible=False, showticklabels=False)
+            fig.update_yaxes(visible=False, showticklabels=False)
+            # Plot court
+            st.plotly_chart(fig, use_container_width=True)
 
+    def create_dashboard(self):
         leading_stats_container = st.container(border=True)
         left, mid_left, mid_right, right = st.columns(4)
 
         # Leading Overall Statistics
         with left:
             card_1 = st.container(border=True)
-            st.subheader(":fire: Leading Scorer :fire:")
+            st.subheader("Top Scorer")
 
         with mid_left:
             card_2 = st.container(border=True)
@@ -70,3 +82,12 @@ class Dashboard:
         with right:
             card_4 = st.container(border=True)
             st.subheader("Free Throw Percentage")
+
+
+def main():
+    game_stats = GameStatisticsDashboard()
+    game_stats.create_sidebar()
+    game_stats.build_court()
+    game_stats.create_dashboard()
+
+main()
