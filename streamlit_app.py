@@ -1,11 +1,15 @@
 import streamlit as st
 
+from PIL import Image
+
 
 class Dashboard:
     def __init__(self):
-        st.set_page_config(layout="wide")
+        favicon = Image.open("./assests/basketball.png")
+        st.set_page_config(page_title="BWB Team Statistics", page_icon=favicon, layout="wide")
 
     def create_streamlit(self):
+        # Sidebar
         with st.sidebar:
             options = [
                 'Season 1',
@@ -48,20 +52,21 @@ class Dashboard:
             selected_option = st.sidebar.selectbox("Player", options)
 
         leading_stats_container = st.container(border=True)
-        col_1, col_2, col_3, col_4 = st.columns(4)
+        left, mid_left, mid_right, right = st.columns(4)
 
-        with col_1:
+        # Leading Overall Statistics
+        with left:
             card_1 = st.container(border=True)
             st.subheader(":fire: Leading Scorer :fire:")
 
-        with col_2:
+        with mid_left:
             card_2 = st.container(border=True)
             st.subheader("Most Field Goals Made")
 
-        with col_3:
+        with mid_right:
             card_3 = st.container(border=True)
             st.subheader("Most 3PT Field Goals made")
 
-        with col_4:
+        with right:
             card_4 = st.container(border=True)
             st.subheader("Free Throw Percentage")
