@@ -9,7 +9,17 @@ from utils import court_coordinates as cc
 
 class GameStatisticsDashboard:
     def __init__(self):
-        st.set_page_config(layout="wide")
+        favicon = Image.open('./assests/basketball.png')
+        st.set_page_config(
+            page_title='Game Analysis',
+            page_icon=favicon,
+            layout='wide',
+        )
+        # Uppercase all text
+        st.markdown(
+            '<style> body { text-transform: uppercase; } </style>',
+            unsafe_allow_html=True
+        )
 
     def create_sidebar(self):
         # Sidebar
@@ -18,64 +28,103 @@ class GameStatisticsDashboard:
                 'AverageJoe',
                 'RiseUp',
             ]
-            selected_option = st.sidebar.selectbox("League", options)
+            selected_option = st.sidebar.selectbox('League', options)
 
             if selected_option == 'AverageJoe':
                 with st.sidebar:
                     options = [
                         'Season 1',
                     ]
-                    selected_option = st.sidebar.selectbox("Season", options)
+                    selected_option = st.sidebar.selectbox('Season', options)
 
                 with st.sidebar:
                     options = [
-                        "Game 1  | BWB vs. Venoms",
-                        "Game 2  | BWB vs. ABG",
-                        "Game 3  | BWB vs. GoEasy",
-                        "Game 4  | BWB vs. --",
-                        "Game 5  | BWB vs. --",
-                        "Game 6  | BWB vs. --",
-                        "Game 7  | BWB vs. --",
-                        "Game 8  | BWB vs. --",
-                        "Game 9  | BWB vs. --",
-                        "Game 10 | BWB vs. --",
-                        "Game 11 | BWB vs. --",
-                        "Game 12 | BWB vs. --",
-                        "Game 13 | BWB vs. --",
-                        "Game 14 | BWB vs. --",
+                        'Game 1  | BWB vs. Venoms',
+                        'Game 2  | BWB vs. ABG',
+                        'Game 3  | BWB vs. GoEasy',
+                        'Game 4  | BWB vs. --',
+                        'Game 5  | BWB vs. --',
+                        'Game 6  | BWB vs. --',
+                        'Game 7  | BWB vs. --',
+                        'Game 8  | BWB vs. --',
+                        'Game 9  | BWB vs. --',
+                        'Game 10 | BWB vs. --',
+                        'Game 11 | BWB vs. --',
+                        'Game 12 | BWB vs. --',
+                        'Game 13 | BWB vs. --',
+                        'Game 14 | BWB vs. --',
                     ]
-                    selected_option = st.sidebar.selectbox("Game", options)
+                    selected_option = st.sidebar.selectbox('Game', options)
+
+                with st.sidebar:
+                    options = [
+                        'Team vs Team',
+                        'David',
+                        'Josh',
+                        'Jake',
+                        'Noel',
+                        'John',
+                        'James',
+                        'Marcus',
+                        'Ricky',
+                    ]
+                    selected_option = st.sidebar.selectbox('Focus', options)
+
             elif selected_option == 'RiseUp':
                 with st.sidebar:
                     options = [
                         'Season 2',
                     ]
-                    selected_option = st.sidebar.selectbox("Season", options)
+                    selected_option = st.sidebar.selectbox('Season', options)
 
                 with st.sidebar:
                     options = [
-                        "Game 1  | BWB vs. --",
-                        "Game 2  | BWB vs. --",
-                        "Game 3  | BWB vs. --",
-                        "Game 4  | BWB vs. --",
-                        "Game 5  | BWB vs. --",
-                        "Game 6  | BWB vs. --",
-                        "Game 7  | BWB vs. --",
-                        "Game 8  | BWB vs. --",
+                        'Game 1  | BWB vs. --',
+                        'Game 2  | BWB vs. --',
+                        'Game 3  | BWB vs. --',
+                        'Game 4  | BWB vs. --',
+                        'Game 5  | BWB vs. --',
+                        'Game 6  | BWB vs. --',
+                        'Game 7  | BWB vs. --',
+                        'Game 8  | BWB vs. --',
                     ]
-                    selected_option = st.sidebar.selectbox("Game", options)
+                    selected_option = st.sidebar.selectbox('Game', options)
+
+                with st.sidebar:
+                    options = [
+                        'Team vs. Team',
+                        'David',
+                        'Josh',
+                        'Jake',
+                        'Noel',
+                        'John',
+                        'James',
+                        'Marcus',
+                        'Ricky',
+                    ]
+                    selected_option = st.sidebar.selectbox('Focus', options)
 
     def plot_basketball_court(self):
-        container_bg = """
+        # container_bg = '''
+        #     <style>
+        #         [id='scene'] {
+        #             background-color: #101010;
+        #         }
+        #         [class='user-select-none svg-container'] {
+        #             background-color: #101010;
+        #         }
+        #     </style>
+        # '''
+        container_bg = '''
             <style>
-                [id="scene"] {
-                    background-color: #101010;
+                [id='scene'] {
+                    background-color: #191919;
                 }
-                [class="user-select-none svg-container"] {
-                    background-color: #101010;
+                [class='user-select-none svg-container'] {
+                    background-color: #191919;
                 }
             </style>
-        """
+        '''
         st.markdown(container_bg, unsafe_allow_html=True)
 
 
@@ -102,7 +151,7 @@ class GameStatisticsDashboard:
             fig.update_yaxes(gridcolor='#e8ecf2')
             fig.update_layout(
                 margin=dict(l=20, r=20, t=20, b=20),
-                scene_aspectmode="data",
+                scene_aspectmode='data',
                 height=600,
                 scene_camera=dict(
                     eye=dict(x=1.3, y=0, z=0.5)
@@ -110,8 +159,8 @@ class GameStatisticsDashboard:
                 scene=dict(
                     xaxis=dict(title='', showticklabels=False, showgrid=False),
                     yaxis=dict(title='', showticklabels=False, showgrid=False),
-                    # Hardwood hexcode (#fee1bd, #e3c9b1, #f1c38e)
-                    zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#292929'),
+                    # Court background hexcode (#fee1bd, #f6e3c8, #c9b7ab, #cfcfcf, #777777)
+                    zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#87939f'),
                 ),
                 legend=dict(
                     yanchor='bottom',
@@ -124,7 +173,7 @@ class GameStatisticsDashboard:
                     title='',
                     itemsizing='constant'
                 ),
-                legend_traceorder="reversed"
+                legend_traceorder='reversed'
             )
 
             # # Remove axis values
@@ -148,19 +197,19 @@ class GameStatisticsDashboard:
         # Leading Overall Statistics
         with left:
             card_1 = st.container(border=True)
-            st.subheader("Top Scorer")
+            st.subheader('Top Scorer')
 
         with mid_left:
             card_2 = st.container(border=True)
-            st.subheader("Most Field Goals Made")
+            st.subheader('Most Field Goals Made')
 
         with mid_right:
             card_3 = st.container(border=True)
-            st.subheader("Most 3PT Field Goals made")
+            st.subheader('Most 3PT Field Goals made')
 
         with right:
             card_4 = st.container(border=True)
-            st.subheader("Free Throw Percentage")
+            st.subheader('Free Throw Percentage')
 
 
 def main():
