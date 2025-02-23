@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 
 from PIL import Image
 from numpy import sin, cos, pi
-from streamlit_elements import dashboard, elements, mui, html
+from streamlit_elements import dashboard, elements, mui, html, nivo
 
 
 
@@ -57,38 +57,11 @@ class PlayerStatisticsDashboard:
     def create_dashboard(self):
         self.dashboard_elements()
 
-    def career_stats(self):
-        '''Career overall stats.'''
-
-        with elements('nested_children'):
-            with mui.Paper:
-                with mui.Typography:
-                    html.p('hellow world')
-                    html.p('bye world')
-
-    def last_game_stats(self):
-        '''Most recent game.'''
-        pass
-
     def dashboard_elements(self):
-        with elements('player_name'):
-            mui.Box(
-                'Player Name',
-                sx={
-                    'margin': '0px',
-                    'padding': '0px',
-                    'color': '#232323',
-                    'text-transform': 'uppercase',
-                    'font-family': 'sans-serif',
-                    'font-weight': 'bold',
-                    'font-size': '90px',
-                }
-            )
-
         card_theme = {
-            'backgroundColor': '#9f9f9f',
+            'backgroundColor': '#b9b9b9',
             'backdrop-filter': 'blur(60px)',
-            'opacity': '0.7',
+            'opacity': '.8',
             'font-family': 'sans-serif',
             'color': '#262626',
         }
@@ -104,12 +77,20 @@ class PlayerStatisticsDashboard:
                 dashboard.Item('heatmap_block', 4, 5, 8, 5, isResizable=True, isDraggable=True, moved=False),
             ]
 
+            mui.Box(
+                'Player Name',
+                sx={
+                    'color': '#484848',
+                    'text-transform': 'uppercase',
+                    'font-family': 'sans-serif',
+                    'font-weight': 'bold',
+                    'font-size': '150px',
+                }
+            )
+
             with dashboard.Grid(layout):
-                mui.Card(
-                    mui.CardContent('RADAR GRAPH'),
-                    sx=card_theme,
-                    key='radar_graph',
-                )
+                with mui.Box(sx=card_theme, key='radar_graph'):
+                    self.radar_graph()
 
                 mui.Card(
                     mui.CardContent('ATTEMPTS vs. MAKES (Field Goals) PER GAME'),
@@ -118,15 +99,13 @@ class PlayerStatisticsDashboard:
                 )
 
                 mui.Card(
-                    mui.Typography('CAREER STATS'),
-                    mui.CardContent('23'),
+                    mui.CardContent('CAREER STATS'),
                     sx=card_theme,
                     key='overall_stat_block',
                 )
 
                 mui.Card(
-                    mui.Typography('PREVIOUS GAME STATS'),
-                    mui.CardContent('999'),
+                    mui.CardContent('PREVIOUS GAME STATS'),
                     sx=card_theme,
                     key='last_game_stat_block',
                 )
@@ -137,66 +116,77 @@ class PlayerStatisticsDashboard:
                     key='heatmap_block',
                 )
 
+    def career_stats(self):
+        '''Career overall stats.'''
+
+        with elements('nested_children'):
+            with mui.Paper:
+                with mui.Typography:
+                    html.p('hellow world')
+                    html.p('bye world')
+
+    def last_game_stats(self):
+        '''Most recent game.'''
+        pass
+
+    def radar_graph(self):
+        with elements("nivo_charts"):
+            DATA = [
+                { "taste": "fruity", "chardonay": 93, "carmenere": 61, "syrah": 114  },
+                { "taste": "bitter", "chardonay": 91, "carmenere": 37, "syrah": 72  },
+                { "taste": "heavy", "chardonay": 56, "carmenere": 95, "syrah": 99  },
+                { "taste": "strong", "chardonay": 64, "carmenere": 90, "syrah": 30  },
+                { "taste": "sunny", "chardonay": 119, "carmenere": 94, "syrah": 103  },
+            ]
+
+            nivo.Radar(
+                data=DATA,
+                keys=[ "chardonay", "carmenere", "syrah"  ],
+                indexBy="taste",
+                valueFormat=">-.2f",
+                margin={ "top": 70, "right": 80, "bottom": 40, "left": 80  },
+                borderColor={ "from": "color"  },
+                gridLabelOffset=36,
+                dotSize=10,
+                dotColor={ "theme": "background"  },
+                dotBorderWidth=2,
+                motionConfig="wobbly",
+                legends=[
+                    {
+                        "anchor": "top-left",
+                        "direction": "column",
+                        "translateX": -50,
+                        "translateY": -40,
+                        "itemWidth": 80,
+                        "itemHeight": 20,
+                        "itemTextColor": "#232323",
+                        "symbolSize": 12,
+                        "symbolShape": "circle",
+                        "effects": [
+                            {
+                                "on": "hover",
+                                "style": {
+                                    "itemTextColor": "#6b47e3"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                theme={
+                    "background": "#bbbbbb",
+                    "textColor": "#232323",
+                    "tooltip": {
+                        "container": {
+                            "background": "#bbbbbb",
+                            "color": "#232323",
+                        }
+                    }
+                }
+            )
+
     def shot_chart_heatmap(self):
         pass
 
-    def degree_to_radian(self, degrees):
-        return degrees*pi/180
-
-    def draw_circular_gauge(self, degree_start, degree_end, annotation_text, r=1.0, padding=0.2, tick_length=0.02):
-        radian_start, radian_end = self.degree_to_radian(degree_start), self.degree_to_radian(degree_end)
-        theta = np.linspace(radian_start,radian_end,5000)
-        x = r * cos(theta)
-        y = r * sin(theta)
-        fig = go.Figure()
-
-        # draw the gauge bar
-        fig.add_trace(go.Scatter(
-            x=x,
-            y=y,
-            mode='markers',
-            marker_symbol='circle',
-            marker_size=20,
-            hoverinfo='skip'
-        ))
-
-        # draw the inside radial border
-        for r_outer in [r-padding,r+padding]:
-            fig.add_shape(
-                type='circle',
-                xref='x', yref='y',
-                x0=-r_outer, y0=-r_outer, x1=r_outer, y1=r_outer,
-                line_color='white',
-            )
-            tick_theta = np.linspace(pi,-pi,13)
-            tick_labels = np.linspace(0,330,12)
-            tick_start_x, tick_end_x = (r+padding)*cos(tick_theta), (r+padding+tick_length)*cos(tick_theta)
-            tick_start_y, tick_end_y = (r+padding)*sin(tick_theta), (r+padding+tick_length)*sin(tick_theta)
-            tick_label_x, tick_label_y = (r+padding+0.04+tick_length)*cos(tick_theta), (r+padding+0.04+tick_length)*sin(tick_theta)
-
-            # add ticks
-            for i in range(len(tick_theta)):
-                # add text in the center of the plot
-                fig.add_trace(go.Scatter(
-                    x=[0], y=[0],
-                    mode='text',
-                    text=[annotation_text],
-                    textfont=dict(size=30),
-                    textposition='middle center',
-                    hoverinfo='skip'
-                ))
-
-            # get rid of axes, ticks, background
-            fig.update_layout(
-                showlegend=False,
-                xaxis_range=[-1.5,1.5], yaxis_range=[-1.5,1.5],
-                xaxis_visible=False, xaxis_showticklabels=False,
-                yaxis_visible=False, yaxis_showticklabels=False,
-                template='plotly_white',
-                width=800, height=800
-
-            )
-            return fig
 
 
 
