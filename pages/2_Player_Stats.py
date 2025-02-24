@@ -59,11 +59,9 @@ class PlayerStatisticsDashboard:
 
     def dashboard_elements(self):
         card_theme = {
-            'backgroundColor': '#b9b9b9',
-            'backdrop-filter': 'blur(60px)',
-            'opacity': '.8',
+            'backgroundColor': '#e5e5e5',
             'font-family': 'sans-serif',
-            'color': '#262626',
+            'color': '#252525',
         }
 
         with elements('dashboard'):
@@ -80,7 +78,8 @@ class PlayerStatisticsDashboard:
             mui.Box(
                 'Player Name',
                 sx={
-                    'color': '#484848',
+                    'color': '#252525',
+                    'opacity': '0.1',
                     'text-transform': 'uppercase',
                     'font-family': 'sans-serif',
                     'font-weight': 'bold',
@@ -130,57 +129,68 @@ class PlayerStatisticsDashboard:
         pass
 
     def radar_graph(self):
-        with elements("nivo_charts"):
+        with elements('nivo_charts'):
             DATA = [
-                { "taste": "fruity", "chardonay": 93, "carmenere": 61, "syrah": 114  },
-                { "taste": "bitter", "chardonay": 91, "carmenere": 37, "syrah": 72  },
-                { "taste": "heavy", "chardonay": 56, "carmenere": 95, "syrah": 99  },
-                { "taste": "strong", "chardonay": 64, "carmenere": 90, "syrah": 30  },
-                { "taste": "sunny", "chardonay": 119, "carmenere": 94, "syrah": 103  },
+                { 'index': 'SCORING', 'PLAYER': 93, 'TEAM': 61, 'TOP': 114  },
+                { 'index': 'SHOOTING', 'PLAYER': 91, 'TEAM': 37, 'TOP': 72  },
+                { 'index': '2P%', 'PLAYER': 91, 'TEAM': 37, 'TOP': 72  },
+                { 'index': '3P%', 'PLAYER': 91, 'TEAM': 37, 'TOP': 72  },
+                { 'index': 'ASSISTS', 'PLAYER': 56, 'TEAM': 95, 'TOP': 99  },
+                { 'index': 'REBOUNDS', 'PLAYER': 64, 'TEAM': 90, 'TOP': 30  },
+                { 'index': 'STEALS', 'PLAYER': 119, 'TEAM': 94, 'TOP': 103  },
+                { 'index': 'TURNOVERS', 'PLAYER': 119, 'TEAM': 94, 'TOP': 103  },
             ]
 
             nivo.Radar(
                 data=DATA,
-                keys=[ "chardonay", "carmenere", "syrah"  ],
-                indexBy="taste",
-                valueFormat=">-.2f",
-                margin={ "top": 70, "right": 80, "bottom": 40, "left": 80  },
-                borderColor={ "from": "color"  },
-                gridLabelOffset=36,
-                dotSize=10,
-                dotColor={ "theme": "background"  },
-                dotBorderWidth=2,
-                motionConfig="wobbly",
+                keys=[ 'PLAYER', 'TEAM', 'TOP'],
+                # colors = [ '#6c45fe', '#faa000', '#dc143c' ],
+                # colorBy='index',
+                colors={ 'scheme': 'paired' },
+                fillOpacity=0.35,
+                indexBy='index',
+                valueFormat='>-.2f',
+                margin={ 'top': 70, 'right': 80, 'bottom': 40, 'left': 80  },
+                borderColor={ 'from': 'color'  },
+                gridLabelOffset=15,
+                enableDots=True,
+                # enableDotLabel=False,
+                # dotLabel='value',
+                # dotSize=18,
+                # dotColor={ 'from': 'color' },
+                # dotBorderColor={ 'from': 'inherit' },
+                # dotBorderWidth=2,
+                # dotLabelYOffset=-8,
+                motionConfig='wobbly',
                 legends=[
                     {
-                        "anchor": "top-left",
-                        "direction": "column",
-                        "translateX": -50,
-                        "translateY": -40,
-                        "itemWidth": 80,
-                        "itemHeight": 20,
-                        "itemTextColor": "#232323",
-                        "symbolSize": 12,
-                        "symbolShape": "circle",
-                        "effects": [
+                        'anchor': 'top-left',
+                        'direction': 'column',
+                        'translateX': -50,
+                        'translateY': -40,
+                        'itemWidth': 80,
+                        'itemHeight': 20,
+                        'itemTextColor': '#252525',
+                        'symbolSize': 12,
+                        'symbolShape': 'circle',
+                        'effects': [
                             {
-                                "on": "hover",
-                                "style": {
-                                    "itemTextColor": "#6b47e3"
+                                'on': 'hover',
+                                'style': {
+                                    'itemTextColor': '#6c45fe'
                                 }
                             }
                         ]
                     }
                 ],
                 theme={
-                    "background": "#bbbbbb",
-                    "textColor": "#232323",
-                    "tooltip": {
-                        "container": {
-                            "background": "#bbbbbb",
-                            "color": "#232323",
+                    'textColor': '#252525',
+                    'tooltip': {
+                        'container': {
+                            'color': '#252525',
                         }
-                    }
+                    },
+                    'gridColor': '#000',
                 }
             )
 
