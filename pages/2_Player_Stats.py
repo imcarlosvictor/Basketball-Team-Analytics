@@ -59,7 +59,7 @@ class PlayerStatisticsDashboard:
 
     def dashboard_elements(self):
         card_theme = {
-            'backgroundColor': '#e5e5e5',
+            'backgroundColor': '#efefef',
             'font-family': 'sans-serif',
             'color': '#252525',
         }
@@ -68,11 +68,11 @@ class PlayerStatisticsDashboard:
             # First, build a default layout for every element you want to include in your dashboard
             layout = [
                 # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
-                dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=True, isDraggable=True, moved=False),
-                dashboard.Item('shot_attempts_vs_made_block', 4, 0, 8, 4, isResizable=True, isDraggable=True, moved=False),
-                dashboard.Item('overall_stat_block', 0, 5, 2, 5, isResizable=True, isDraggable=True, moved=False),
-                dashboard.Item('last_game_stat_block', 2, 5, 2, 5, isResizable=True, isDraggable=True, moved=False),
-                dashboard.Item('heatmap_block', 4, 5, 8, 5, isResizable=True, isDraggable=True, moved=False),
+                dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('shot_attempts_vs_made_block', 4, 0, 8, 4, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('career_stats_block', 0, 5, 2, 6, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('season_stats_block_1', 2, 5, 2, 2, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('heatmap_block', 4, 5, 8, 6, isResizable=False, isDraggable=False, moved=False),
             ]
 
             mui.Box(
@@ -92,7 +92,7 @@ class PlayerStatisticsDashboard:
                     self.radar_graph()
 
                 mui.Card(
-                    mui.CardContent('ATTEMPTS vs. MAKES (Field Goals) PER GAME'),
+                    mui.CardContent('LAST GAME EXCEL HEATMAP'),
                     sx=card_theme,
                     key='shot_attempts_vs_made_block',
                 )
@@ -100,14 +100,15 @@ class PlayerStatisticsDashboard:
                 mui.Card(
                     mui.CardContent('CAREER STATS'),
                     sx=card_theme,
-                    key='overall_stat_block',
+                    key='career_stats_block',
                 )
 
-                mui.Card(
-                    mui.CardContent('PREVIOUS GAME STATS'),
-                    sx=card_theme,
-                    key='last_game_stat_block',
-                )
+                with mui.Box(sx=card_theme, key='season_stats_block_1'):
+                    with elements('block'):
+                        mui.Typography('Season Stats', variant='h6')
+                        self.career_stats()
+                        self.career_stats()
+                        self.career_stats()
 
                 mui.Card(
                     mui.CardContent('SHOT CHART HEATMAP'),
@@ -118,35 +119,94 @@ class PlayerStatisticsDashboard:
     def career_stats(self):
         '''Career overall stats.'''
 
-        with elements('nested_children'):
-            with mui.Paper:
-                with mui.Typography:
-                    html.p('hellow world')
-                    html.p('bye world')
+        with elements('radial_chart'):
+            DATA = [
+                { "id": "Player",
+                    "data": [
+                        { "x": "PPG", "y": 23.3 },
+                        { "x": "cap", "y": 6.7 },
+                    ]
+                }
+            ]
+
+            nivo.RadialBar(
+                data=DATA,
+                # width=275,
+                # height=250,
+                padding=0.5,
+                valueFormat='>-.2f',
+                startAngle=-124,
+                endAngle=124,
+                innerRadius=0.65,
+                cornerRadius=2,
+                margin={'top': 20, 'right': 20, 'bottom': 20, 'left': 20},
+                colors = ['#07da63', '#b4b9c7'],
+                # colors = [ '#07da63', '#f5c512', '#e5e5e5'],
+                # colors = [ '#1eb281', '#f3e05e', '#dc143c', '#e5e5e5'],
+                # colorBy='index',
+                # colors={'scheme': 'red_yellow_green'},
+                borderColor={'from': 'color', 'modifiers': {'darker': 1}},
+                enableTracks=True,
+                # tracksColor='#e3e3e3',
+                enableRadialGrid=False,
+                enableCircularGrid=False,
+                radialAxisStart=None,
+                circularAxisOuter=None,
+                motionConfig='molasses',
+                transitionMode='startAngle',
+                layers=[
+                    'grid',
+                    'tracks',
+                    'bars',
+                    'labels',
+                    'legends',
+                    {
+                        'type': 'custom',
+                        'render': {
+                            'x': .5,
+                            'y': .5,
+                            'text': 'PPG',
+                            'textAlign': 'center',
+                            'dominantBaseline': 'central',
+                            'style': {
+                                'fontSize': 26,
+                                'fontWeight': 'bold',
+                                'fill': '#232323',
+                            }
+                        }
+                    }
+                ]
+            )
+
 
     def last_game_stats(self):
         '''Most recent game.'''
         pass
 
     def radar_graph(self):
-        with elements('nivo_charts'):
+        with elements('radar_graph'):
             DATA = [
-                { 'index': 'SCORING', 'PLAYER': 93, 'TEAM': 61, 'TOP': 114  },
-                { 'index': 'SHOOTING', 'PLAYER': 91, 'TEAM': 37, 'TOP': 72  },
-                { 'index': '2P%', 'PLAYER': 91, 'TEAM': 37, 'TOP': 72  },
-                { 'index': '3P%', 'PLAYER': 91, 'TEAM': 37, 'TOP': 72  },
-                { 'index': 'ASSISTS', 'PLAYER': 56, 'TEAM': 95, 'TOP': 99  },
-                { 'index': 'REBOUNDS', 'PLAYER': 64, 'TEAM': 90, 'TOP': 30  },
-                { 'index': 'STEALS', 'PLAYER': 119, 'TEAM': 94, 'TOP': 103  },
-                { 'index': 'TURNOVERS', 'PLAYER': 119, 'TEAM': 94, 'TOP': 103  },
+                { 'index': 'SCORING', 'TEAM': 93, 'PLAYER': 61, 'TOP': 114  },
+                { 'index': 'SHOOTING', 'TEAM': 91, 'PLAYER': 37, 'TOP': 72  },
+                { 'index': '2P%', 'TEAM': 91, 'PLAYER': 37, 'TOP': 72  },
+                { 'index': '3P%', 'TEAM': 91, 'PLAYER': 37, 'TOP': 72  },
+                { 'index': 'ASSISTS', 'TEAM': 56, 'PLAYER': 95, 'TOP': 99  },
+                { 'index': 'REBOUNDS', 'TEAM': 64, 'PLAYER': 90, 'TOP': 30  },
+                { 'index': 'STEALS', 'TEAM': 119, 'PLAYER': 94, 'TOP': 103  },
+                { 'index': 'TURNOVERS', 'TEAM': 119, 'PLAYER': 94, 'TOP': 103  },
             ]
 
             nivo.Radar(
                 data=DATA,
-                keys=[ 'PLAYER', 'TEAM', 'TOP'],
-                # colors = [ '#6c45fe', '#faa000', '#dc143c' ],
-                # colorBy='index',
-                colors={ 'scheme': 'paired' },
+                keys=[ 'TOP', 'TEAM', 'PLAYER'],
+                # colors={ 'scheme': 'paired' },
+                # colors={ 'scheme': 'spectral' },
+                # colors = [ '#e4364b', '#ba98f5', '#ff8c00' ],
+                # colors = [ '#359982', '#9ac2ee', '#0b79b4' ],
+                colors = [ '#8ab8fe', '#79bbac', '#005ffd'],
+                # colors = [ '#8ab8fe', '#359982', '#005ffd'],
+                colorBy='index',
+                curve='catmullRomClosed',
                 fillOpacity=0.35,
                 indexBy='index',
                 valueFormat='>-.2f',
@@ -157,9 +217,9 @@ class PlayerStatisticsDashboard:
                 # enableDotLabel=False,
                 # dotLabel='value',
                 # dotSize=18,
-                # dotColor={ 'from': 'color' },
-                # dotBorderColor={ 'from': 'inherit' },
-                # dotBorderWidth=2,
+                dotColor='#fff',
+                dotBorderColor={'from': 'color'},
+                dotBorderWidth=1,
                 # dotLabelYOffset=-8,
                 motionConfig='wobbly',
                 legends=[
@@ -177,13 +237,14 @@ class PlayerStatisticsDashboard:
                             {
                                 'on': 'hover',
                                 'style': {
-                                    'itemTextColor': '#6c45fe'
+                                    'itemTextColor': '#dc143c'
                                 }
                             }
                         ]
                     }
                 ],
                 theme={
+                    'background': '#ececec',
                     'textColor': '#252525',
                     'tooltip': {
                         'container': {

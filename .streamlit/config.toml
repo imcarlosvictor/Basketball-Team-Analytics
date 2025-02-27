@@ -1,12 +1,14 @@
 [theme]
 # base="dark"
 # primaryColor="#6c45fe"
+# primaryColor="#8a97eb"
 # primaryColor="#16a68e"
 # primaryColor="#9ac2ee"
+# primaryColor="#0b79b4"
 # primaryColor="#e0f501"
 # primaryColor="#fb9c1b"
+# primaryColor="#ff7600"
 # primaryColor="#dc143c"
-# primaryColor="#6799cf"
 
 # textColor="#b4b9c7"
 # backgroundColor="#101010"
@@ -16,7 +18,7 @@
 base="light"
 font="sans serif"
 textColor="#232323"
-primaryColor="#6c45fe"
+primaryColor="#1eb281"
 backgroundColor="#ececec"
 secondaryBackgroundColor="#f8f8f8"
 
