@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 from PIL import Image
 from numpy import sin, cos, pi
 from streamlit_elements import dashboard, elements, mui, html, nivo
+from streamlit_extras.grid import grid
 
 
 
@@ -68,11 +69,11 @@ class PlayerStatisticsDashboard:
             # First, build a default layout for every element you want to include in your dashboard
             layout = [
                 # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
-                dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('shot_attempts_vs_made_block', 4, 0, 8, 4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('career_stats_block', 0, 5, 2, 6, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('season_stats_block_1', 2, 5, 2, 2, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('heatmap_block', 4, 5, 8, 6, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=True, isDraggable=True, moved=False),
+                dashboard.Item('heatmap_block', 4, 0, 8, 4, isResizable=True, isDraggable=True, moved=False),
+                dashboard.Item('career_stats_block', 0, 5, 4, 2.6, isResizable=True, isDraggable=True, moved=False),
+                dashboard.Item('season_stats_block', 0, 9, 4, 2.6, isResizable=True, isDraggable=True, moved=False),
+                dashboard.Item('game_log', 4, 0, 8, 5.2, isResizable=True, isDraggable=True, moved=False),
             ]
 
             mui.Box(
@@ -92,39 +93,277 @@ class PlayerStatisticsDashboard:
                     self.radar_graph()
 
                 mui.Card(
-                    mui.CardContent('LAST GAME EXCEL HEATMAP'),
-                    sx=card_theme,
-                    key='shot_attempts_vs_made_block',
-                )
-
-                mui.Card(
-                    mui.CardContent('CAREER STATS'),
-                    sx=card_theme,
-                    key='career_stats_block',
-                )
-
-                with mui.Box(sx=card_theme, key='season_stats_block_1'):
-                    with elements('block'):
-                        mui.Typography('Season Stats', variant='h6')
-                        self.career_stats()
-                        self.career_stats()
-                        self.career_stats()
-
-                mui.Card(
                     mui.CardContent('SHOT CHART HEATMAP'),
                     sx=card_theme,
                     key='heatmap_block',
                 )
 
+                with mui.Box(sx=card_theme, key='career_stats_block'):
+                    self.career_stats()
+
+                with mui.Box(sx=card_theme, key='season_stats_block'):
+                    self.season_stats()
+
+                mui.Card(
+                    mui.CardContent('GAME LOG'),
+                    sx=card_theme,
+                    key='game_log',
+                )
+
+    def metrics(self):
+        with st.container(height=450, border=True):
+            career_grid = grid(4, gap='small', vertical_align='center')
+            career_grid.metric('PTS', '24.5', '.5')
+            career_grid.metric('AST', '2', '-.5')
+            career_grid.metric('STL', '3', '.2')
+            career_grid.metric('BLK', '.2', '-.1')
+
+            career_grid.metric('PTS', '24.5', '.5')
+            career_grid.metric('AST', '2', '-.5')
+            career_grid.metric('STL', '3', '.2')
+            career_grid.metric('BLK', '.2', '-.1')
+
+            career_grid.metric('PTS', '24.5', '.5')
+            career_grid.metric('AST', '2', '-.5')
+            career_grid.metric('STL', '3', '.2')
+            career_grid.metric('BLK', '.2', '-.1')
+
+            career_grid.metric('PTS', '24.5', '.5')
+            career_grid.metric('AST', '2', '-.5')
+            career_grid.metric('STL', '3', '.2')
+            career_grid.metric('BLK', '.2', '-.1')
+
     def career_stats(self):
+        career_data = {
+            'pts': 15.3,
+            'ast': 2.1,
+            'stl': 3.1,
+            'blk': 3.1,
+            'orb': 5.6,
+            'drb': 8.2,
+            'foul': 3,
+            'tur': 2,
+            'fg': 6.5,
+            'fg%': 45.6,
+            'ft': 5.3,
+            'ft%': 75.2,
+            '2p': 5.7,
+            '2p%': 41.6,
+            '3p': 4.1,
+            '3p%': 32.2,
+        }
+        self.grid_statistics('career statistics', career_data)
+
+    def season_stats(self):
+        season_data = {
+            'pts': 25.3,
+            'ast': 2.1,
+            'stl': .7,
+            'blk': 1.2,
+            'orb': 3.6,
+            'drb': 7.2,
+            'foul': 4,
+            'tur': 2,
+            'fg': 6.5,
+            'fg%': 45.6,
+            'ft': 5.3,
+            'ft%': 87.5,
+            '2p': 6.7,
+            '2p%': 51.6,
+            '3p': 3.1,
+            '3p%': 43.2,
+        }
+        self.grid_statistics('season statistics', season_data)
+
+    def grid_statistics(self, block_title: str, data):
+        html.div(
+            block_title,
+            css={
+                'padding': '.5em .5em .5em 2em',
+                'backgroundColor': '#dfdfdf',
+                'color': '#232323',
+                'display': 'grid',
+                'justify-content': 'start',
+                'align-items': 'end',
+                'text-transform': 'uppercase',
+                'font-family': 'sans-serif',
+                'font-weight': 'bold',
+                'font-size': '15px',
+            }
+        )
+
+        with elements('statistics_overview_dashboard'):
+            BOX_CSS = {
+                'height': 5,
+                'width': 10,
+                'p': 0,
+                'display': 'flex',
+                'flex-direction': 'column',
+                'justify-content': 'center',
+                'align-items': 'center',
+                ':hover': {
+                    'background': '#d4d4d4',
+                }
+            }
+
+            TITLE_CSS = {
+                'color': '#232323',
+                'font-size': 15,
+            }
+
+            VALUE_CSS = {
+                'color': '#101010',
+                'font-size': 22,
+                'font-weight': 'medium',
+            }
+
+            FFI_BOX_CSS = {
+                'p': 0,
+                'display': 'flex',
+                'radius': 3,
+                'flex-direction': 'column',
+                'justify-content': 'center',
+                'align-items': 'center',
+                'background': '#6c45fe',
+            }
+
+            FFI_TITLE_CSS = {
+                'color': '#ececec',
+                'font-size': 15,
+            }
+
+            FFI_VALUE_CSS = {
+                'color': '#ececec',
+                'font-size': 22,
+                'font-weight': 'medium',
+            }
+
+            # First, build a default layout for every element you want to include in your dashboard
+            layout = [
+                # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
+                dashboard.Item('PTS', 0, 0, .7, .5, isResizable=False, isDraggable=False, isBounded=True),
+                dashboard.Item('AST', .7, 0, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('STL', 1.4, 0, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('BLK', 2.1, 0, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('EFGP', 2.8, 0, 1, .5, isResizable=False, isDraggable=False, moved=False), # FOUR FACTOR INDEX
+
+                dashboard.Item('ORB', 0, .5, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('DRB', .7, .5, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('FOUL', 1.4, .5, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('TUR', 2.1, .5, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('TURR', 2.8, .5, 1, .5, isResizable=False, isDraggable=False, moved=False), # FOUR FACTOR INDEX
+
+                dashboard.Item('FG', 0, 1, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('FG%', .7, 1, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('FT', 1.4, 1, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('FT%', 2.1, 1, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('ORB%', 2.8, 1, 1, .5, isResizable=False, isDraggable=False, moved=False), # FOUR FACTOR INDEX
+
+                dashboard.Item('2P', 0, 1.5, .7, .5, isResizable=False, isDraggable=True, moved=False),
+                dashboard.Item('2P%', .7, 1.5, .7, .5, isResizable=False, isDraggable=True, moved=False),
+                dashboard.Item('3P', 1.4, 1.5, .7, .5, isResizable=False, isDraggable=True, moved=False),
+                dashboard.Item('3P%', 2.1, 1.5, .7, .5, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('FTR', 2.8, 1.5, 1, .5, isResizable=False, isDraggable=False, moved=False), # FOUR FACTOR INDEX
+            ]
+
+            with dashboard.Grid(layout):
+                # ----------------- ROW 1 -----------------
+                with mui.Box(key='PTS', sx=BOX_CSS):
+                    mui.Box('PTS', sx=TITLE_CSS)
+                    mui.Box(data['pts'], sx=VALUE_CSS)
+
+                with mui.Box(key='AST', sx=BOX_CSS):
+                    mui.Box('AST', sx=TITLE_CSS)
+                    mui.Box(data['ast'], sx=VALUE_CSS)
+
+                with mui.Box(key='STL', sx=BOX_CSS):
+                    mui.Box('STL', sx=TITLE_CSS)
+                    mui.Box(data['stl'], sx=VALUE_CSS)
+
+                with mui.Box(key='BLK', sx=BOX_CSS):
+                    mui.Box('BLK', sx=TITLE_CSS)
+                    mui.Box(data['blk'], sx=VALUE_CSS)
+
+                with mui.Box(key='EFGP', sx=FFI_BOX_CSS): # FOUR FACTOR INDEX
+                    mui.Box('EFGP', sx=FFI_TITLE_CSS)
+                    mui.Box(data['2p'], sx=FFI_VALUE_CSS)
+
+            # ----------------- ROW 2 -----------------
+            with dashboard.Grid(layout):
+                with mui.Box(key='ORB', sx=BOX_CSS):
+                    mui.Box('ORB', sx=TITLE_CSS)
+                    mui.Box(data['orb'], sx=VALUE_CSS)
+
+                with mui.Box(key='DRB', sx=BOX_CSS):
+                    mui.Box('DRB', sx=TITLE_CSS)
+                    mui.Box(data['drb'], sx=VALUE_CSS)
+
+                with mui.Box(key='FOUL', sx=BOX_CSS):
+                    mui.Box('FOUL', sx=TITLE_CSS)
+                    mui.Box(data['foul'], sx=VALUE_CSS)
+
+                with mui.Box(key='TUR', sx=BOX_CSS):
+                    mui.Box('TUR', sx=TITLE_CSS)
+                    mui.Box(data['tur'], sx=VALUE_CSS)
+
+                with mui.Box(key='TURR', sx=FFI_BOX_CSS): # FOUR FACTOR INDEX
+                    mui.Box('TURR', sx=FFI_TITLE_CSS)
+                    mui.Box(data['2p%'], sx=FFI_VALUE_CSS)
+
+            # ----------------- ROW 3 -----------------
+            with dashboard.Grid(layout):
+                with mui.Box(key='FG', sx=BOX_CSS):
+                    mui.Box('FG', sx=TITLE_CSS)
+                    mui.Box(data['fg'], sx=VALUE_CSS)
+
+                with mui.Box(key='FG%', sx=BOX_CSS):
+                    mui.Box('FG%', sx=TITLE_CSS)
+                    mui.Box(data['fg%'], sx=VALUE_CSS)
+
+                with mui.Box(key='FT', sx=BOX_CSS):
+                    mui.Box('FT', sx=TITLE_CSS)
+                    mui.Box(data['ft'], sx=VALUE_CSS)
+
+                with mui.Box(key='FT%', sx=BOX_CSS):
+                    mui.Box('FT%', sx=TITLE_CSS)
+                    mui.Box(data['ft%'], sx=VALUE_CSS)
+
+                with mui.Box(key='ORB%', sx=FFI_BOX_CSS): # FOUR FACTOR INDEX
+                    mui.Box('ORB%', sx=FFI_TITLE_CSS)
+                    mui.Box(data['3p'], sx=FFI_VALUE_CSS)
+
+            # ----------------- ROW 4 -----------------
+            with dashboard.Grid(layout):
+                with mui.Box(key='2P', sx=BOX_CSS):
+                    mui.Box('2P', sx=TITLE_CSS)
+                    mui.Box(data['2p'], sx=VALUE_CSS)
+
+                with mui.Box(key='2P%', sx=BOX_CSS):
+                    mui.Box('2P%', sx=TITLE_CSS)
+                    mui.Box(data['2p%'], sx=VALUE_CSS)
+
+                with mui.Box(key='3P', sx=BOX_CSS):
+                    mui.Box('3P', sx=TITLE_CSS)
+                    mui.Box(data['3p'], sx=VALUE_CSS)
+
+                with mui.Box(key='3P%', sx=BOX_CSS):
+                    mui.Box('3P%', sx=TITLE_CSS)
+                    mui.Box(data['3p%'], sx=VALUE_CSS)
+
+                with mui.Box(key='FTR', sx=FFI_BOX_CSS): # FOUR FACTOR INDEX
+                    mui.Box('FTR', sx=FFI_TITLE_CSS)
+                    mui.Box(data['3p%'], sx=FFI_VALUE_CSS)
+
+
+    def radial_bar(self):
         '''Career overall stats.'''
 
         with elements('radial_chart'):
             DATA = [
                 { "id": "Player",
-                    "data": [
-                        { "x": "PPG", "y": 23.3 },
-                        { "x": "cap", "y": 6.7 },
+                 "data": [
+                     { "x": "PPG", "y": 23.3 },
+                     { "x": "cap", "y": 6.7 },
                     ]
                 }
             ]
@@ -178,22 +417,17 @@ class PlayerStatisticsDashboard:
                 ]
             )
 
-
-    def last_game_stats(self):
-        '''Most recent game.'''
-        pass
-
     def radar_graph(self):
         with elements('radar_graph'):
             DATA = [
                 { 'index': 'SCORING', 'TEAM': 93, 'PLAYER': 61, 'TOP': 114  },
                 { 'index': 'SHOOTING', 'TEAM': 91, 'PLAYER': 37, 'TOP': 72  },
-                { 'index': '2P%', 'TEAM': 91, 'PLAYER': 37, 'TOP': 72  },
                 { 'index': '3P%', 'TEAM': 91, 'PLAYER': 37, 'TOP': 72  },
                 { 'index': 'ASSISTS', 'TEAM': 56, 'PLAYER': 95, 'TOP': 99  },
                 { 'index': 'REBOUNDS', 'TEAM': 64, 'PLAYER': 90, 'TOP': 30  },
                 { 'index': 'STEALS', 'TEAM': 119, 'PLAYER': 94, 'TOP': 103  },
                 { 'index': 'TURNOVERS', 'TEAM': 119, 'PLAYER': 94, 'TOP': 103  },
+                { 'index': 'PER', 'TEAM': 119, 'PLAYER': 94, 'TOP': 103  },
             ]
 
             nivo.Radar(
@@ -203,24 +437,23 @@ class PlayerStatisticsDashboard:
                 # colors={ 'scheme': 'spectral' },
                 # colors = [ '#e4364b', '#ba98f5', '#ff8c00' ],
                 # colors = [ '#359982', '#9ac2ee', '#0b79b4' ],
-                colors = [ '#8ab8fe', '#79bbac', '#005ffd'],
+                # colors = [ '#ffb128', '#ff8916', '#dc143c'],
                 # colors = [ '#8ab8fe', '#359982', '#005ffd'],
+                # colors = [ '#e7b7f4', '#9488d8', '#dc143c'],
+                # colors = [ '#ffaf31', '#ff7600', '#ff398e'],
+                colors = [ '#ffaf31', '#ff4655', '#6c45fe'],
                 colorBy='index',
                 curve='catmullRomClosed',
                 fillOpacity=0.35,
                 indexBy='index',
                 valueFormat='>-.2f',
-                margin={ 'top': 70, 'right': 80, 'bottom': 40, 'left': 80  },
+                margin={ 'top': 70, 'right': 90, 'bottom': 40, 'left': 90},
                 borderColor={ 'from': 'color'  },
                 gridLabelOffset=15,
                 enableDots=True,
-                # enableDotLabel=False,
-                # dotLabel='value',
-                # dotSize=18,
                 dotColor='#fff',
                 dotBorderColor={'from': 'color'},
                 dotBorderWidth=1,
-                # dotLabelYOffset=-8,
                 motionConfig='wobbly',
                 legends=[
                     {
@@ -244,7 +477,7 @@ class PlayerStatisticsDashboard:
                     }
                 ],
                 theme={
-                    'background': '#ececec',
+                    # 'background': '#ececec',
                     'textColor': '#252525',
                     'tooltip': {
                         'container': {
@@ -257,7 +490,6 @@ class PlayerStatisticsDashboard:
 
     def shot_chart_heatmap(self):
         pass
-
 
 
 
