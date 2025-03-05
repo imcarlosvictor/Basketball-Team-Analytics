@@ -70,10 +70,11 @@ class PlayerStatisticsDashboard:
             layout = [
                 # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
                 dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('heatmap_block', 4, 0, 8, 4, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('line_graph', 4, 0, 8, 4, isResizable=False, isDraggable=False, moved=False),
                 dashboard.Item('career_stats_block', 0, 5, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
                 dashboard.Item('season_stats_block', 0, 9, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('game_log', 4, 0, 8, 5.0, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('heatmap_block', 0, 13, 4, 3, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('game_log', 4, 0, 8, 10.0, isResizable=False, isDraggable=False, moved=False),
             ]
 
             mui.Box(
@@ -104,34 +105,46 @@ class PlayerStatisticsDashboard:
                 with mui.Box(sx=card_theme, key='season_stats_block'):
                     self.season_stats()
 
-                mui.Card(
-                    mui.CardContent('GAME LOG'),
-                    sx=card_theme,
-                    key='game_log',
+                with mui.Box(sx=card_theme, key='line_graph'):
+                    self.line_graph()
+
+                with mui.Box(sx=card_theme, key='game_log'):
+                    # df = [
+                    #     ['date','opp','result','fg','fg%','2p','2p%','3p','3p%','ft','ft%','reb','ast','blk','stl','to','pts'],
+                    # ]
+                    df = pd.DataFrame(np.random.randn(50, 20), columns=("col %d" % i for i in range(20)))
+                    # self.game_log(df, 'Game Log', 100)
+
+    def game_log(self, df, title, height, color_df=None):
+        fig = go.Figure(
+            data = [
+                go.Table(
+                    header=dict(
+                        values=df.columns,
+                        font=dict(size=12, color='white'),
+                        fill_color='#8a97eb',
+                        line_color='#232323',
+                        align=['left', 'center'],
+                        height=30
+                    ),
+                    cells=dict(
+                        values=[df[K].tolist() for K in df.columns],
+                        font=dict(size=12),
+                        align=['left','center'],
+                        # fill_color=[color_df[K].tolist() for K in color_df.columns],
+                        # line_color=[color_df[K].tolist() for K in color_df.columns],
+                        height=20
+                    )
                 )
-
-    def metrics(self):
-        with st.container(height=450, border=True):
-            career_grid = grid(4, gap='small', vertical_align='center')
-            career_grid.metric('PTS', '24.5', '.5')
-            career_grid.metric('AST', '2', '-.5')
-            career_grid.metric('STL', '3', '.2')
-            career_grid.metric('BLK', '.2', '-.1')
-
-            career_grid.metric('PTS', '24.5', '.5')
-            career_grid.metric('AST', '2', '-.5')
-            career_grid.metric('STL', '3', '.2')
-            career_grid.metric('BLK', '.2', '-.1')
-
-            career_grid.metric('PTS', '24.5', '.5')
-            career_grid.metric('AST', '2', '-.5')
-            career_grid.metric('STL', '3', '.2')
-            career_grid.metric('BLK', '.2', '-.1')
-
-            career_grid.metric('PTS', '24.5', '.5')
-            career_grid.metric('AST', '2', '-.5')
-            career_grid.metric('STL', '3', '.2')
-            career_grid.metric('BLK', '.2', '-.1')
+            ]
+        )
+        fig.update_layout(
+            title_text=title,
+            title_font_color='white',
+            title_x=0,
+            margin=dict(l=0,r=10,b=20,t=30),
+            height=height
+        )
 
     def career_stats(self):
         career_data = {
@@ -372,7 +385,7 @@ class PlayerStatisticsDashboard:
             '4-Factors Index: 28.5',
             css={
                 'margin-bottom': '1em',
-                'padding': '.5em 2em .5em .5em',
+                'padding': '.5em 2.3em .5em .5em',
                 # 'backgroundColor': '#dfdfdf',
                 'color': '#232323',
                 'display': 'grid',
@@ -380,63 +393,204 @@ class PlayerStatisticsDashboard:
                 'align-items': 'start',
                 'text-transform': 'uppercase',
                 'font-family': 'sans-serif',
-                'font-stlye': 'italic',
+                'font-style': 'italic',
                 'font-size': '14px',
             }
         )
 
-
-    def radial_bar(self):
-        '''Career overall stats.'''
-
-        with elements('radial_chart'):
+    def line_graph(self):
+        with elements('line_graph'):
             DATA = [
-                { "id": "Player",
-                 "data": [
-                     { "x": "PPG", "y": 23.3 },
-                     { "x": "cap", "y": 6.7 },
+                {
+                    "id": "Turnovers",
+                    "data": [
+                        { "x": "Game 1", "y": 0 },
+                        { "x": "Game 2", "y": 0 },
+                        { "x": "Game 3", "y": 1 },
+                        { "x": "Game 4", "y": 0 },
+                        { "x": "Game 5", "y": 0 },
+                        { "x": "Game 6", "y": 2 },
+                        { "x": "Game 7", "y": 4 },
+                        { "x": "Game 8", "y": 0 },
+                        { "x": "Game 9", "y": 0 },
+                        { "x": "Game 10", "y": 0 },
+                        { "x": "Game 11", "y": 0 },
+                        { "x": "Game 12", "y": 0 },
+                        { "x": "Game 13", "y": 2 },
+                        { "x": "Game 14", "y": 0 },
                     ]
-                }
+                },
+                {
+                    "id": "Steals",
+                    "data": [
+                        { "x": "Game 1", "y": 0 },
+                        { "x": "Game 2", "y": 2 },
+                        { "x": "Game 3", "y": 1 },
+                        { "x": "Game 4", "y": 0 },
+                        { "x": "Game 5", "y": 0 },
+                        { "x": "Game 6", "y": 0 },
+                        { "x": "Game 7", "y": 1 },
+                        { "x": "Game 8", "y": 0 },
+                        { "x": "Game 9", "y": 0 },
+                        { "x": "Game 10", "y": 0 },
+                        { "x": "Game 11", "y": 0 },
+                        { "x": "Game 12", "y": 1 },
+                        { "x": "Game 13", "y": 2 },
+                        { "x": "Game 14", "y": 2 },
+                    ]
+                },
+                {
+                    "id": "Blocks",
+                    "data": [
+                        { "x": "Game 1", "y": 0 },
+                        { "x": "Game 2", "y": 2 },
+                        { "x": "Game 3", "y": 1 },
+                        { "x": "Game 4", "y": 0 },
+                        { "x": "Game 5", "y": 0 },
+                        { "x": "Game 6", "y": 1 },
+                        { "x": "Game 7", "y": 1 },
+                        { "x": "Game 8", "y": 0 },
+                        { "x": "Game 9", "y": 0 },
+                        { "x": "Game 10", "y": 0 },
+                        { "x": "Game 11", "y": 0 },
+                        { "x": "Game 12", "y": 0 },
+                        { "x": "Game 13", "y": 2 },
+                        { "x": "Game 14", "y": 0 },
+                    ]
+                },
+                {
+                    "id": "Assists",
+                    "data": [
+                        { "x": "Game 1", "y": 3 },
+                        { "x": "Game 2", "y": 2 },
+                        { "x": "Game 3", "y": 2 },
+                        { "x": "Game 4", "y": 4 },
+                        { "x": "Game 5", "y": 2 },
+                        { "x": "Game 6", "y": 3 },
+                        { "x": "Game 7", "y": 1 },
+                        { "x": "Game 8", "y": 0 },
+                        { "x": "Game 9", "y": 0 },
+                        { "x": "Game 10", "y": 2 },
+                        { "x": "Game 11", "y": 1 },
+                        { "x": "Game 12", "y": 0 },
+                        { "x": "Game 13", "y": 2 },
+                        { "x": "Game 14", "y": 4 },
+                    ]
+                },
+                {
+                    "id": "Rebounds",
+                    "data": [
+                        { "x": "Game 1", "y": 3 },
+                        { "x": "Game 2", "y": 7 },
+                        { "x": "Game 3", "y": 10 },
+                        { "x": "Game 4", "y": 11 },
+                        { "x": "Game 5", "y": 7 },
+                        { "x": "Game 6", "y": 9 },
+                        { "x": "Game 7", "y": 4 },
+                        { "x": "Game 8", "y": 6 },
+                        { "x": "Game 9", "y": 5 },
+                        { "x": "Game 10", "y": 10 },
+                        { "x": "Game 11", "y": 5 },
+                        { "x": "Game 12", "y": 3 },
+                        { "x": "Game 13", "y": 12 },
+                        { "x": "Game 14", "y": 8 },
+                    ]
+                },
+                {
+                    "id": "Points",
+                    "data": [
+                        { "x": "Game 1", "y": 3 },
+                        { "x": "Game 2", "y": 0 },
+                        { "x": "Game 3", "y": 12 },
+                        { "x": "Game 4", "y": 15 },
+                        { "x": "Game 5", "y": 17 },
+                        { "x": "Game 6", "y": 4 },
+                        { "x": "Game 7", "y": 6 },
+                        { "x": "Game 8", "y": 10 },
+                        { "x": "Game 9", "y": 12 },
+                        { "x": "Game 10", "y": 4 },
+                        { "x": "Game 11", "y": 6 },
+                        { "x": "Game 12", "y": 6 },
+                        { "x": "Game 13", "y": 0 },
+                        { "x": "Game 14", "y": 12 },
+                    ]
+                },
             ]
 
-            nivo.RadialBar(
+            nivo.Line(
                 data=DATA,
-                padding=0.5,
-                valueFormat='>-.2f',
-                startAngle=-124,
-                endAngle=124,
-                innerRadius=0.65,
-                cornerRadius=2,
-                margin={'top': 20, 'right': 20, 'bottom': 20, 'left': 20},
-                colors = ['#07da63', '#b4b9c7'],
-                borderColor={'from': 'color', 'modifiers': {'darker': 1}},
-                enableTracks=True,
-                enableRadialGrid=False,
-                enableCircularGrid=False,
-                radialAxisStart=None,
-                circularAxisOuter=None,
-                motionConfig='molasses',
-                transitionMode='startAngle',
-                layers=[
-                    'grid',
-                    'tracks',
-                    'bars',
-                    'labels',
-                    'legends',
+                margin={
+                    'top': 50,
+                    'right':30,
+                    'bottom':50,
+                    'left':60
+                },
+                xScale={'type': 'point'},
+                yScale={
+                    'type': 'linear',
+                    'min': 'auto',
+                    'max': 'auto',
+                    # 'stacked': True,
+                    'reverse': False,
+                },
+                yFormat='',
+                axisTop=None,
+                axisRight=None,
+                axisBottom={
+                    'tickSize':5,
+                    'tickPadding':5,
+                    'tickRotation':-52,
+                    'legend':'',
+                    'legendOffset':52,
+                    'legendPosition':'middle',
+                    'truncateTickAt':0,
+                },
+                axisLeft={
+                    'tickSize': 5,
+                    'tickPadding': 5,
+                    'tickRotation': 0,
+                    'legendOffset': -40,
+                    'legendPosition': 'middle',
+                    'truncateTickAt': 0,
+                },
+                colors={'scheme': 'paired'},
+                pointSize=9,
+                pointColor={'from': 'color', 'modifiers': []},
+                pointBorderWidth=2,
+                pointBorderColor={'theme': 'background', 'modifiers': []},
+                enablePointLabel=True,
+                pointLabel='y',
+                pointLabelYOffset=-12,
+                areaOpacity=0.25,
+                isInteractive=True,
+                useMesh=True,
+                debugMesh=True,
+                enableSlices='x',
+                enableTouchCrosshair=True,
+                legends=[
                     {
-                        'type': 'custom',
-                        'render': {
-                            'x': .5,
-                            'y': .5,
-                            'text': 'PPG',
-                            'textAlign': 'center',
-                            'dominantBaseline': 'central',
-                            'style': {
-                                'fontSize': 26,
-                                'fontWeight': 'bold',
-                                'fill': '#232323',
+                        'anchor': 'top',
+                        'direction': 'row',
+                        'justify': False,
+                        'translateX': 18,
+                        'translateY': -37,
+                        'itemsSpacing': 0,
+                        'itemDirection': 'left-to-right',
+                        'itemWidth': 80,
+                        'itemHeight': 20,
+                        'itemOpacity': 0.75,
+                        'symbolSize': 12,
+                        'symbolShape': 'square',
+                        'symbolBorderColor': 'rgba(0,0,0,.5)',
+                        'effects': [
+                            {
+                                'on': 'hover',
+                                'style': {
+                                    'itemBackground': '#dfdfdf',
+                                    'itemOpacity': 1,
+                                }
                             }
-                        }
+                        ]
                     }
                 ]
             )
@@ -458,20 +612,15 @@ class PlayerStatisticsDashboard:
                 data=DATA,
                 keys=[ 'TOP', 'TEAM', 'PLAYER'],
                 # colors={ 'scheme': 'paired' },
-                # colors={ 'scheme': 'spectral' },
-                # colors = [ '#e4364b', '#ba98f5', '#ff8c00' ],
-                # colors = [ '#359982', '#9ac2ee', '#0b79b4' ],
                 # colors = [ '#ffb128', '#ff8916', '#dc143c'],
-                # colors = [ '#8ab8fe', '#359982', '#005ffd'],
                 # colors = [ '#e7b7f4', '#9488d8', '#dc143c'],
-                # colors = [ '#ffaf31', '#ff7600', '#ff398e'],
-                colors = [ '#ffaf31', '#ff4655', '#008080'],
+                colors = [ '#ffaf31', '#ff4655', '#6c45fe'],
                 colorBy='index',
                 curve='catmullRomClosed',
                 fillOpacity=0.35,
                 indexBy='index',
                 valueFormat='>-.2f',
-                margin={ 'top': 70, 'right': 90, 'bottom': 40, 'left': 90},
+                margin={'top': 70, 'right': 90, 'bottom': 40, 'left': 90},
                 borderColor={ 'from': 'color'  },
                 gridLabelOffset=15,
                 enableDots=True,
