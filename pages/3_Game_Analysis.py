@@ -5,6 +5,7 @@ from PIL import Image
 from streamlit_extras.stylable_container import stylable_container
 
 from utils import court_coordinates as cc
+from modules.basketball_court import draw_court
 
 
 class GameStatisticsDashboard:
@@ -15,6 +16,7 @@ class GameStatisticsDashboard:
             page_icon=favicon,
             layout='wide',
         )
+        draw_court()
         # Uppercase all text
         st.markdown(
             '<style> body { text-transform: uppercase; } </style>',
@@ -105,23 +107,13 @@ class GameStatisticsDashboard:
                     selected_option = st.sidebar.selectbox('Focus', options)
 
     def plot_basketball_court(self):
-        # container_bg = '''
-        #     <style>
-        #         [id='scene'] {
-        #             background-color: #101010;
-        #         }
-        #         [class='user-select-none svg-container'] {
-        #             background-color: #101010;
-        #         }
-        #     </style>
-        # '''
         container_bg = '''
             <style>
                 [id='scene'] {
-                    background-color: #191919;
+                    background-color: #ececec;
                 }
                 [class='user-select-none svg-container'] {
-                    background-color: #191919;
+                    background-color: #ececec;
                 }
             </style>
         '''
@@ -140,12 +132,11 @@ class GameStatisticsDashboard:
                 line_group='line_group',
                 color='color',
                 color_discrete_map={
-                           'court': '#dedede',
+                           'court': '#232323',
                            'hoop': '#e47041'
                 },
                 markers=False,
             )
-
             fig.update_traces(line=dict(width=3), hovertemplate=None, hoverinfo='skip', showlegend=False)
             fig.update_xaxes(gridcolor='#e8ecf2')
             fig.update_yaxes(gridcolor='#e8ecf2')
@@ -159,8 +150,8 @@ class GameStatisticsDashboard:
                 scene=dict(
                     xaxis=dict(title='', showticklabels=False, showgrid=False),
                     yaxis=dict(title='', showticklabels=False, showgrid=False),
-                    # Court background hexcode (#fee1bd, #f6e3c8, #c9b7ab, #cfcfcf, #777777)
-                    zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#87939f'),
+                    # Court background hexcode (#fee1bd, #f6e3c8, #c9b7ab, #cfcfcf, #777777, #87939f)
+                    zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#feccaa'),
                 ),
                 legend=dict(
                     yanchor='bottom',

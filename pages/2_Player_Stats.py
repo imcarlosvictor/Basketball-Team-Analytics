@@ -1,13 +1,18 @@
+import base64
 import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
+import matplotlib.pyplot as plt
 
 from PIL import Image
+from io import BytesIO
 from numpy import sin, cos, pi
-from streamlit_elements import dashboard, elements, mui, html, nivo
 from streamlit_extras.grid import grid
+from streamlit_elements import dashboard, elements, mui, html, nivo
+
+from modules.basketball_court import draw_court
 
 
 
@@ -65,20 +70,27 @@ class PlayerStatisticsDashboard:
             'color': '#252525',
         }
 
+        left_coloumn_card_theme = {
+            'backgroundColor': '#efefef',
+            'font-family': 'sans-serif',
+            'color': '#252525',
+            'max-width': '600px',
+        }
+
         with elements('dashboard'):
             # First, build a default layout for every element you want to include in your dashboard
             layout = [
                 # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
                 dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=False, isDraggable=False, moved=False),
                 dashboard.Item('line_graph', 4, 0, 8, 4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('career_stats_block', 0, 5, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('season_stats_block', 0, 9, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('heatmap_block', 0, 13, 4, 3, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('career_stats', 0, 5, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('season_stats', 0, 9, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
+                dashboard.Item('heatmap', 0, 13, 4, 3, isResizable=False, isDraggable=False, moved=False),
                 dashboard.Item('game_log', 4, 0, 8, 10.0, isResizable=False, isDraggable=False, moved=False),
             ]
 
             mui.Box(
-                'Player Name',
+                'Player Name #7',
                 sx={
                     'color': '#252525',
                     'opacity': '0.1',
@@ -90,29 +102,25 @@ class PlayerStatisticsDashboard:
             )
 
             with dashboard.Grid(layout):
-                with mui.Box(sx=card_theme, key='radar_graph'):
+                with mui.Box(sx=left_coloumn_card_theme, key='radar_graph'):
                     self.radar_graph()
-
-                mui.Card(
-                    mui.CardContent('SHOT CHART HEATMAP'),
-                    sx=card_theme,
-                    key='heatmap_block',
-                )
-
-                with mui.Box(sx=card_theme, key='career_stats_block'):
-                    self.career_stats()
-
-                with mui.Box(sx=card_theme, key='season_stats_block'):
-                    self.season_stats()
 
                 with mui.Box(sx=card_theme, key='line_graph'):
                     self.line_graph()
 
+                with mui.Box(sx=left_coloumn_card_theme, key='career_stats'):
+                    self.career_stats()
+
+                with mui.Box(sx=left_coloumn_card_theme, key='season_stats'):
+                    self.season_stats()
+
+                with mui.Box(sx=left_coloumn_card_theme, key='heatmap'):
+                    self.heatmap()
                 with mui.Box(sx=card_theme, key='game_log'):
                     # df = [
                     #     ['date','opp','result','fg','fg%','2p','2p%','3p','3p%','ft','ft%','reb','ast','blk','stl','to','pts'],
                     # ]
-                    df = pd.DataFrame(np.random.randn(50, 20), columns=("col %d" % i for i in range(20)))
+                    df = pd.DataFrame(np.random.randn(50, 20), columns=('col %d' % i for i in range(20)))
                     # self.game_log(df, 'Game Log', 100)
 
     def game_log(self, df, title, height, color_df=None):
@@ -402,117 +410,117 @@ class PlayerStatisticsDashboard:
         with elements('line_graph'):
             DATA = [
                 {
-                    "id": "Turnovers",
-                    "data": [
-                        { "x": "Game 1", "y": 0 },
-                        { "x": "Game 2", "y": 0 },
-                        { "x": "Game 3", "y": 1 },
-                        { "x": "Game 4", "y": 0 },
-                        { "x": "Game 5", "y": 0 },
-                        { "x": "Game 6", "y": 2 },
-                        { "x": "Game 7", "y": 4 },
-                        { "x": "Game 8", "y": 0 },
-                        { "x": "Game 9", "y": 0 },
-                        { "x": "Game 10", "y": 0 },
-                        { "x": "Game 11", "y": 0 },
-                        { "x": "Game 12", "y": 0 },
-                        { "x": "Game 13", "y": 2 },
-                        { "x": "Game 14", "y": 0 },
+                    'id': 'Turnovers',
+                    'data': [
+                        { 'x': 'Game 1', 'y': 0 },
+                        { 'x': 'Game 2', 'y': 0 },
+                        { 'x': 'Game 3', 'y': 1 },
+                        { 'x': 'Game 4', 'y': 0 },
+                        { 'x': 'Game 5', 'y': 0 },
+                        { 'x': 'Game 6', 'y': 2 },
+                        { 'x': 'Game 7', 'y': 4 },
+                        { 'x': 'Game 8', 'y': 0 },
+                        { 'x': 'Game 9', 'y': 0 },
+                        { 'x': 'Game 10', 'y': 0 },
+                        { 'x': 'Game 11', 'y': 0 },
+                        { 'x': 'Game 12', 'y': 0 },
+                        { 'x': 'Game 13', 'y': 2 },
+                        { 'x': 'Game 14', 'y': 0 },
                     ]
                 },
                 {
-                    "id": "Steals",
-                    "data": [
-                        { "x": "Game 1", "y": 0 },
-                        { "x": "Game 2", "y": 2 },
-                        { "x": "Game 3", "y": 1 },
-                        { "x": "Game 4", "y": 0 },
-                        { "x": "Game 5", "y": 0 },
-                        { "x": "Game 6", "y": 0 },
-                        { "x": "Game 7", "y": 1 },
-                        { "x": "Game 8", "y": 0 },
-                        { "x": "Game 9", "y": 0 },
-                        { "x": "Game 10", "y": 0 },
-                        { "x": "Game 11", "y": 0 },
-                        { "x": "Game 12", "y": 1 },
-                        { "x": "Game 13", "y": 2 },
-                        { "x": "Game 14", "y": 2 },
+                    'id': 'Steals',
+                    'data': [
+                        { 'x': 'Game 1', 'y': 0 },
+                        { 'x': 'Game 2', 'y': 2 },
+                        { 'x': 'Game 3', 'y': 1 },
+                        { 'x': 'Game 4', 'y': 0 },
+                        { 'x': 'Game 5', 'y': 0 },
+                        { 'x': 'Game 6', 'y': 0 },
+                        { 'x': 'Game 7', 'y': 1 },
+                        { 'x': 'Game 8', 'y': 0 },
+                        { 'x': 'Game 9', 'y': 0 },
+                        { 'x': 'Game 10', 'y': 0 },
+                        { 'x': 'Game 11', 'y': 0 },
+                        { 'x': 'Game 12', 'y': 1 },
+                        { 'x': 'Game 13', 'y': 2 },
+                        { 'x': 'Game 14', 'y': 2 },
                     ]
                 },
                 {
-                    "id": "Blocks",
-                    "data": [
-                        { "x": "Game 1", "y": 0 },
-                        { "x": "Game 2", "y": 2 },
-                        { "x": "Game 3", "y": 1 },
-                        { "x": "Game 4", "y": 0 },
-                        { "x": "Game 5", "y": 0 },
-                        { "x": "Game 6", "y": 1 },
-                        { "x": "Game 7", "y": 1 },
-                        { "x": "Game 8", "y": 0 },
-                        { "x": "Game 9", "y": 0 },
-                        { "x": "Game 10", "y": 0 },
-                        { "x": "Game 11", "y": 0 },
-                        { "x": "Game 12", "y": 0 },
-                        { "x": "Game 13", "y": 2 },
-                        { "x": "Game 14", "y": 0 },
+                    'id': 'Blocks',
+                    'data': [
+                        { 'x': 'Game 1', 'y': 0 },
+                        { 'x': 'Game 2', 'y': 2 },
+                        { 'x': 'Game 3', 'y': 1 },
+                        { 'x': 'Game 4', 'y': 0 },
+                        { 'x': 'Game 5', 'y': 0 },
+                        { 'x': 'Game 6', 'y': 1 },
+                        { 'x': 'Game 7', 'y': 1 },
+                        { 'x': 'Game 8', 'y': 0 },
+                        { 'x': 'Game 9', 'y': 0 },
+                        { 'x': 'Game 10', 'y': 0 },
+                        { 'x': 'Game 11', 'y': 0 },
+                        { 'x': 'Game 12', 'y': 0 },
+                        { 'x': 'Game 13', 'y': 2 },
+                        { 'x': 'Game 14', 'y': 0 },
                     ]
                 },
                 {
-                    "id": "Assists",
-                    "data": [
-                        { "x": "Game 1", "y": 3 },
-                        { "x": "Game 2", "y": 2 },
-                        { "x": "Game 3", "y": 2 },
-                        { "x": "Game 4", "y": 4 },
-                        { "x": "Game 5", "y": 2 },
-                        { "x": "Game 6", "y": 3 },
-                        { "x": "Game 7", "y": 1 },
-                        { "x": "Game 8", "y": 0 },
-                        { "x": "Game 9", "y": 0 },
-                        { "x": "Game 10", "y": 2 },
-                        { "x": "Game 11", "y": 1 },
-                        { "x": "Game 12", "y": 0 },
-                        { "x": "Game 13", "y": 2 },
-                        { "x": "Game 14", "y": 4 },
+                    'id': 'Assists',
+                    'data': [
+                        { 'x': 'Game 1', 'y': 3 },
+                        { 'x': 'Game 2', 'y': 2 },
+                        { 'x': 'Game 3', 'y': 2 },
+                        { 'x': 'Game 4', 'y': 4 },
+                        { 'x': 'Game 5', 'y': 2 },
+                        { 'x': 'Game 6', 'y': 3 },
+                        { 'x': 'Game 7', 'y': 1 },
+                        { 'x': 'Game 8', 'y': 0 },
+                        { 'x': 'Game 9', 'y': 0 },
+                        { 'x': 'Game 10', 'y': 2 },
+                        { 'x': 'Game 11', 'y': 1 },
+                        { 'x': 'Game 12', 'y': 0 },
+                        { 'x': 'Game 13', 'y': 2 },
+                        { 'x': 'Game 14', 'y': 4 },
                     ]
                 },
                 {
-                    "id": "Rebounds",
-                    "data": [
-                        { "x": "Game 1", "y": 3 },
-                        { "x": "Game 2", "y": 7 },
-                        { "x": "Game 3", "y": 10 },
-                        { "x": "Game 4", "y": 11 },
-                        { "x": "Game 5", "y": 7 },
-                        { "x": "Game 6", "y": 9 },
-                        { "x": "Game 7", "y": 4 },
-                        { "x": "Game 8", "y": 6 },
-                        { "x": "Game 9", "y": 5 },
-                        { "x": "Game 10", "y": 10 },
-                        { "x": "Game 11", "y": 5 },
-                        { "x": "Game 12", "y": 3 },
-                        { "x": "Game 13", "y": 12 },
-                        { "x": "Game 14", "y": 8 },
+                    'id': 'Rebounds',
+                    'data': [
+                        { 'x': 'Game 1', 'y': 3 },
+                        { 'x': 'Game 2', 'y': 7 },
+                        { 'x': 'Game 3', 'y': 10 },
+                        { 'x': 'Game 4', 'y': 11 },
+                        { 'x': 'Game 5', 'y': 7 },
+                        { 'x': 'Game 6', 'y': 9 },
+                        { 'x': 'Game 7', 'y': 4 },
+                        { 'x': 'Game 8', 'y': 6 },
+                        { 'x': 'Game 9', 'y': 5 },
+                        { 'x': 'Game 10', 'y': 10 },
+                        { 'x': 'Game 11', 'y': 5 },
+                        { 'x': 'Game 12', 'y': 3 },
+                        { 'x': 'Game 13', 'y': 12 },
+                        { 'x': 'Game 14', 'y': 8 },
                     ]
                 },
                 {
-                    "id": "Points",
-                    "data": [
-                        { "x": "Game 1", "y": 3 },
-                        { "x": "Game 2", "y": 0 },
-                        { "x": "Game 3", "y": 12 },
-                        { "x": "Game 4", "y": 15 },
-                        { "x": "Game 5", "y": 17 },
-                        { "x": "Game 6", "y": 4 },
-                        { "x": "Game 7", "y": 6 },
-                        { "x": "Game 8", "y": 10 },
-                        { "x": "Game 9", "y": 12 },
-                        { "x": "Game 10", "y": 4 },
-                        { "x": "Game 11", "y": 6 },
-                        { "x": "Game 12", "y": 6 },
-                        { "x": "Game 13", "y": 0 },
-                        { "x": "Game 14", "y": 12 },
+                    'id': 'Points',
+                    'data': [
+                        { 'x': 'Game 1', 'y': 3 },
+                        { 'x': 'Game 2', 'y': 0 },
+                        { 'x': 'Game 3', 'y': 12 },
+                        { 'x': 'Game 4', 'y': 15 },
+                        { 'x': 'Game 5', 'y': 17 },
+                        { 'x': 'Game 6', 'y': 4 },
+                        { 'x': 'Game 7', 'y': 6 },
+                        { 'x': 'Game 8', 'y': 10 },
+                        { 'x': 'Game 9', 'y': 12 },
+                        { 'x': 'Game 10', 'y': 4 },
+                        { 'x': 'Game 11', 'y': 6 },
+                        { 'x': 'Game 12', 'y': 6 },
+                        { 'x': 'Game 13', 'y': 0 },
+                        { 'x': 'Game 14', 'y': 12 },
                     ]
                 },
             ]
@@ -539,7 +547,7 @@ class PlayerStatisticsDashboard:
                 axisBottom={
                     'tickSize':5,
                     'tickPadding':5,
-                    'tickRotation':-52,
+                    'tickRotation':-35,
                     'legend':'',
                     'legendOffset':52,
                     'legendPosition':'middle',
@@ -614,7 +622,8 @@ class PlayerStatisticsDashboard:
                 # colors={ 'scheme': 'paired' },
                 # colors = [ '#ffb128', '#ff8916', '#dc143c'],
                 # colors = [ '#e7b7f4', '#9488d8', '#dc143c'],
-                colors = [ '#ffaf31', '#ff4655', '#6c45fe'],
+                # colors = [ '#ffaf31', '#ff4655', '#6c45fe'],
+                colors = [ '#ffaf31', '#ff4655', '#5d5ef4'],
                 colorBy='index',
                 curve='catmullRomClosed',
                 fillOpacity=0.35,
@@ -661,8 +670,42 @@ class PlayerStatisticsDashboard:
                 }
             )
 
-    def shot_chart_heatmap(self):
-        pass
+    def heatmap(self):
+        # Plotting
+        # fig, ax = plt.subplots(figsize=(6.1,5.4))
+        # fig, ax = plt.subplots(figsize=(5.25,4.4))
+        # draw_court(ax, outer_lines=True)
+        plt.figure(figsize=(5.25,4.4))
+        draw_court(outer_lines=True)
+
+        # Update figure with new parameters
+        # plt.xlim(-300,300)
+        plt.xlim(-250,360)
+        plt.ylim(-50,450)
+        # plt.xlim(-250,250)
+        # plt.ylim(-50,430)
+
+        img_base64 = self.plot_to_base64(plt)
+        # st.pyplot(plt) # Plot shot chart
+
+        with elements("plotly_box"):
+            mui.Box(
+                html.Img(src=f'data:image/png;base64,{img_base64}'),
+                sx={
+                    "width": "100%",
+                    "height": "100%",
+                    "backgroundColor": "#efefef",
+                    "margin": "0",
+                    # "opacity": ".3"
+                }
+            )
+
+    def plot_to_base64(self, fig):
+        buf = BytesIO()
+        fig.savefig(buf, format="png", bbox_inches='tight')
+        buf.seek(0)
+        return base64.b64encode(buf.read()).decode('utf-8')
+
 
 
 
