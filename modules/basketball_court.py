@@ -23,7 +23,7 @@ def fiba_court_coordinate(cc):
 
 def draw_court(ax=None, color='black', lw=1.2, outer_lines=False):
     # If an axes object isn't provided to plot onto, just get current one
-    plt.figure(facecolor='#efefef')
+    plt.figure(facecolor='#d8d9de')
     if ax is None:
         ax = plt.gca()
 
@@ -95,7 +95,7 @@ def draw_court(ax=None, color='black', lw=1.2, outer_lines=False):
 
     # Update plot
     # plt.gca().set_facecolor('#f8f8ff')
-    plt.gca().set_facecolor('#efefef')
+    plt.gca().set_facecolor('#f6e3c8')
     plt.axis('off')
     plt.subplots_adjust(left=1, right=2, top=2, bottom=1)
 

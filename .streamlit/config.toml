@@ -17,9 +17,9 @@
 
 base="light"
 font="sans serif"
-textColor="#232323"
-primaryColor="#6c45fe"
-backgroundColor="#ececec"
+textColor="#262f40"
+primaryColor="#83a2db"
+backgroundColor="#d8d9de"
 secondaryBackgroundColor="#f8f8f8"
 
 

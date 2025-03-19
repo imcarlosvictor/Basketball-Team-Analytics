@@ -61,8 +61,17 @@ class Dashboard:
                 st.text('<player name>')
                 st.text('<player name>')
 
+    def game_logs(self):
+        pass
 
+    def player_comparison(self):
+        pass
 
+    def radar_graph(self):
+        pass
+
+    def heatmap(self):
+        pass
 
 def main():
     homepage = Dashboard()

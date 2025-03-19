@@ -150,8 +150,8 @@ class GameStatisticsDashboard:
                 scene=dict(
                     xaxis=dict(title='', showticklabels=False, showgrid=False),
                     yaxis=dict(title='', showticklabels=False, showgrid=False),
-                    # Court background hexcode (#fee1bd, #f6e3c8, #c9b7ab, #cfcfcf, #777777, #87939f)
-                    zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#feccaa'),
+                    # Court background hexcode (#fee1bd, #f4f0e6,  #f6e3c8, #c9b7ab, #cfcfcf, #777777, #87939f)
+                    zaxis=dict(title='',  showticklabels=False, showgrid=False, showbackground=True, backgroundcolor='#f4f0e6'),
                 ),
                 legend=dict(
                     yanchor='bottom',

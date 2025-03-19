@@ -13,6 +13,7 @@ from streamlit_extras.grid import grid
 from streamlit_elements import dashboard, elements, mui, html, nivo
 
 from modules.basketball_court import draw_court
+from modules.nivo_graphs import NivoGraphs
 
 
 
@@ -25,10 +26,10 @@ class PlayerStatisticsDashboard:
             layout='wide',
         )
         # Uppercase all text
-        st.markdown(
-            '<style> body { text-transform: uppercase; } </style>',
-            unsafe_allow_html=True
-        )
+        st.markdown('<style> body { text-transform: uppercase; } </style>', unsafe_allow_html=True)
+        with st.container():
+            self.create_sidebar()
+            self.create_dashboard()
 
     def create_sidebar(self):
         # Sidebar
@@ -61,67 +62,77 @@ class PlayerStatisticsDashboard:
             selected_option = st.sidebar.selectbox('Player', options)
 
     def create_dashboard(self):
-        self.dashboard_elements()
-
-    def dashboard_elements(self):
         card_theme = {
-            'backgroundColor': '#efefef',
+            'background-color': '#f2f2f3',
             'font-family': 'sans-serif',
             'color': '#252525',
+            'border-radius': '.3em',
         }
 
         left_coloumn_card_theme = {
-            'backgroundColor': '#efefef',
+            # 'backgroundColor': '#efefef',
+            'padding': '.5em',
+            'backgroundColor': '#f2f2f3',
+            'backdrop-filter': 'blur(32px)',
             'font-family': 'sans-serif',
             'color': '#252525',
-            'max-width': '600px',
+            # 'max-width': '600px',
+            'border-radius': '5px',
         }
 
-        with elements('dashboard'):
-            # First, build a default layout for every element you want to include in your dashboard
-            layout = [
-                # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
-                dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('line_graph', 4, 0, 8, 4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('career_stats', 0, 5, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('season_stats', 0, 9, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('heatmap', 0, 13, 4, 3, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('game_log', 4, 0, 8, 10.0, isResizable=False, isDraggable=False, moved=False),
-            ]
+        with st.container():
+            with elements('dashboard'):
+                # First, build a default layout for every element you want to include in your dashboard
+                layout = [
+                    # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
+                    dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=False, isDraggable=False, moved=False),
+                    dashboard.Item('line_graph', 4, 0, 8, 4, isResizable=False, isDraggable=False, moved=False),
+                    dashboard.Item('career_stats', 0, 5, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
+                    dashboard.Item('season_stats', 0, 9, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
+                    dashboard.Item('heatmap', 0, 13, 4, 3, isResizable=False, isDraggable=False, moved=False),
+                    dashboard.Item('game_log', 4, 0, 8, 10.0, isResizable=False, isDraggable=False, moved=False),
+                ]
 
-            mui.Box(
-                'Player Name #7',
-                sx={
-                    'color': '#252525',
-                    'opacity': '0.1',
-                    'text-transform': 'uppercase',
-                    'font-family': 'sans-serif',
-                    'font-weight': 'bold',
-                    'font-size': '150px',
-                }
-            )
+                mui.Box(
+                    'Player Name #7',
+                    sx={
+                        'color': '#252525',
+                        'opacity': '0.1',
+                        'text-transform': 'uppercase',
+                        'font-family': 'sans-serif',
+                        'font-weight': 'bold',
+                        'font-size': '150px',
+                    }
+                )
 
-            with dashboard.Grid(layout):
-                with mui.Box(sx=left_coloumn_card_theme, key='radar_graph'):
-                    self.radar_graph()
+                with dashboard.Grid(layout):
+                    with mui.Box(sx=left_coloumn_card_theme, key='radar_graph'):
+                        self.radar_graph()
 
-                with mui.Box(sx=card_theme, key='line_graph'):
-                    self.line_graph()
+                    with mui.Box(sx=card_theme, key='line_graph'):
+                        self.line_graph()
 
-                with mui.Box(sx=left_coloumn_card_theme, key='career_stats'):
-                    self.career_stats()
+                    with mui.Box(sx=left_coloumn_card_theme, key='career_stats'):
+                        self.career_stats()
 
-                with mui.Box(sx=left_coloumn_card_theme, key='season_stats'):
-                    self.season_stats()
+                    with mui.Box(sx=left_coloumn_card_theme, key='season_stats'):
+                        self.season_stats()
 
-                with mui.Box(sx=left_coloumn_card_theme, key='heatmap'):
-                    self.heatmap()
-                with mui.Box(sx=card_theme, key='game_log'):
-                    # df = [
-                    #     ['date','opp','result','fg','fg%','2p','2p%','3p','3p%','ft','ft%','reb','ast','blk','stl','to','pts'],
-                    # ]
-                    df = pd.DataFrame(np.random.randn(50, 20), columns=('col %d' % i for i in range(20)))
-                    # self.game_log(df, 'Game Log', 100)
+                    with mui.Box(sx={
+                        'padding': '.5em',
+                        'backgroundColor': '#d8d9de',
+                        'backdrop-filter': 'blur(32px)',
+                        'max-width': '600px',
+                        'border-radius': '5px',
+                    }, key='heatmap'):
+                        self.heatmap()
+
+                    with mui.Box(sx=card_theme, key='game_log'):
+                        # df = [
+                        #     ['date','opp','result','fg','fg%','2p','2p%','3p','3p%','ft','ft%','reb','ast','blk','stl','to','pts'],
+                        # ]
+                        df = pd.DataFrame(np.random.randn(50, 20), columns=('col %d' % i for i in range(20)))
+                        # self.game_log(df, 'Game Log', 100)
 
     def game_log(self, df, title, height, color_df=None):
         fig = go.Figure(
@@ -200,7 +211,7 @@ class PlayerStatisticsDashboard:
         html.div(
             block_title,
             css={
-                'padding': '.5em .5em .5em .7em',
+                'padding': '.5em .4em .1em .7em',
                 'margin-left': '1em',
                 'margin-right': '1.8em',
                 'border-bottom': 'solid .7px #232323',
@@ -210,7 +221,7 @@ class PlayerStatisticsDashboard:
                 'align-items': 'end',
                 'text-transform': 'uppercase',
                 'font-family': 'sans-serif',
-                'font-weight': 'bold',
+                # 'font-weight': 'bold',
                 'font-size': '15px',
             }
         )
@@ -223,7 +234,7 @@ class PlayerStatisticsDashboard:
                 'justify-content': 'center',
                 'align-items': 'center',
                 ':hover': {
-                    'background': '#d4d4d4',
+                    'background': '#d8d9de',
                 }
             }
 
@@ -234,7 +245,7 @@ class PlayerStatisticsDashboard:
                 'flex-direction': 'column',
                 'justify-content': 'center',
                 'align-items': 'center',
-                'background': '#e3e3e3',
+                'background': '#d8d9de',
             }
 
             TITLE_CSS = {
@@ -619,11 +630,8 @@ class PlayerStatisticsDashboard:
             nivo.Radar(
                 data=DATA,
                 keys=[ 'TOP', 'TEAM', 'PLAYER'],
-                # colors={ 'scheme': 'paired' },
-                # colors = [ '#ffb128', '#ff8916', '#dc143c'],
                 # colors = [ '#e7b7f4', '#9488d8', '#dc143c'],
-                # colors = [ '#ffaf31', '#ff4655', '#6c45fe'],
-                colors = [ '#ffaf31', '#ff4655', '#5d5ef4'],
+                colors = [ '#ffaf31', '#ff4655', '#5c00ff'],
                 colorBy='index',
                 curve='catmullRomClosed',
                 fillOpacity=0.35,
@@ -659,7 +667,6 @@ class PlayerStatisticsDashboard:
                     }
                 ],
                 theme={
-                    # 'background': '#ececec',
                     'textColor': '#252525',
                     'tooltip': {
                         'container': {
@@ -677,26 +684,21 @@ class PlayerStatisticsDashboard:
         # draw_court(ax, outer_lines=True)
         plt.figure(figsize=(5.25,4.4))
         draw_court(outer_lines=True)
+        # st.pyplot(plt) # Plot shot chart
 
         # Update figure with new parameters
-        # plt.xlim(-300,300)
-        plt.xlim(-250,360)
-        plt.ylim(-50,450)
-        # plt.xlim(-250,250)
-        # plt.ylim(-50,430)
+        plt.xlim(-260,320)
+        plt.ylim(-50,430)
 
         img_base64 = self.plot_to_base64(plt)
-        # st.pyplot(plt) # Plot shot chart
 
         with elements("plotly_box"):
             mui.Box(
                 html.Img(src=f'data:image/png;base64,{img_base64}'),
                 sx={
-                    "width": "100%",
+                    "max-width": "100%",
                     "height": "100%",
-                    "backgroundColor": "#efefef",
                     "margin": "0",
-                    # "opacity": ".3"
                 }
             )
 
@@ -711,7 +713,7 @@ class PlayerStatisticsDashboard:
 
 def main():
     player_stats = PlayerStatisticsDashboard()
-    player_stats.create_sidebar()
-    player_stats.create_dashboard()
+    # player_stats.create_sidebar()
+    # player_stats.create_dashboard()
 
 main()
