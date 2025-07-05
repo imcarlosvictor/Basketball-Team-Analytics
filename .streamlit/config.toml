@@ -3,8 +3,7 @@
 # primaryColor="#6c45fe"
 # primaryColor="#8a97eb"
 # primaryColor="#16a68e"
-# primaryColor="#9ac2ee"
-# primaryColor="#0b79b4"
+# primaryColor="#83a2db"
 # primaryColor="#e0f501"
 # primaryColor="#fb9c1b"
 # primaryColor="#ff7600"
@@ -18,9 +17,10 @@
 base="light"
 font="sans serif"
 textColor="#262f40"
-primaryColor="#83a2db"
-backgroundColor="#d8d9de"
-secondaryBackgroundColor="#f8f8f8"
+primaryColor="#5215fc"
+backgroundColor="#f2f3f7"
+secondaryBackgroundColor="#f2f3f7"
+# secondaryBackgroundColor="#f8f8f8"
 
 
 # base="dark"

@@ -11,6 +11,7 @@ from io import BytesIO
 from numpy import sin, cos, pi
 from streamlit_extras.grid import grid
 from streamlit_elements import dashboard, elements, mui, html, nivo
+from streamlit_extras.stylable_container import stylable_container
 
 from modules.basketball_court import draw_court
 from modules.nivo_graphs import NivoGraphs
@@ -28,7 +29,7 @@ class PlayerStatisticsDashboard:
         # Uppercase all text
         st.markdown('<style> body { text-transform: uppercase; } </style>', unsafe_allow_html=True)
         with st.container():
-            self.create_sidebar()
+            # self.create_sidebar()
             self.create_dashboard()
 
     def create_sidebar(self):
@@ -46,33 +47,77 @@ class PlayerStatisticsDashboard:
             ]
             selected_option = st.sidebar.selectbox('Season', options)
 
-        with st.sidebar:
-            options = [
-                'David',
-                'Josh',
-                'Jake',
-                'Noel',
-                'John',
-                'James',
-                'Marcus',
-                'Ricky',
-                'Harry',
-                'Jeff',
-            ]
-            selected_option = st.sidebar.selectbox('Player', options)
+        # with st.sidebar:
+        #     options = [
+        #         'David',
+        #         'Josh',
+        #         'Jake',
+        #         'Noel',
+        #         'John',
+        #         'James',
+        #         'Marcus',
+        #         'Ricky',
+        #         'Harry',
+        #         'Jeff',
+        #     ]
+        #     selected_option = st.sidebar.selectbox('Player', options)
+
+    def season_selection(self):
+        with st.container(border=False):
+            league = ''
+            season = ''
+            player = ''
+            # Season
+            left, middle, right = st.columns(3, vertical_alignment="bottom")
+            with left:
+                options = ['Average Joe', 'RiseUp']
+                league = st.segmented_control("League", options, selection_mode="single", default='Average Joe')
+
+            with middle:
+                options = ['1', '2', '3']
+                season = st.segmented_control("Season", options, selection_mode="single", default='1')
+
+            # Players
+            left_2, middle_2 = st.columns(2, vertical_alignment='bottom')
+            with left_2:
+                options = [
+                    'David Perez',
+                    'Josh',
+                    'Jake',
+                    'Noel Ramos',
+                    'John',
+                    'James Perez',
+                    'Marcus',
+                    'Ricky',
+                    'Harry',
+                    'Jeff',
+                    'James',
+                    'Marcus',
+                    'Ricky',
+                    'Harry',
+                ]
+                player = st.segmented_control('Player', options, selection_mode='single', default='David Perez')
+            st.markdown('#####') # Margin bottom space
+
+        return league, season, player
+
 
     def create_dashboard(self):
+        league, season, player = self.season_selection()
+
         card_theme = {
-            'background-color': '#f2f2f3',
+            # 'background-color': '#f0f1f6',
+            'background-color': '#f8f8f8',
             'font-family': 'sans-serif',
             'color': '#252525',
             'border-radius': '.3em',
         }
 
         left_coloumn_card_theme = {
-            # 'backgroundColor': '#efefef',
             'padding': '.5em',
-            'backgroundColor': '#f2f2f3',
+            # 'backgroundColor': '#efefef',
+            # 'backgroundColor': '#f0f1f6',
+            'backgroundColor': '#f8f8f8',
             'backdrop-filter': 'blur(32px)',
             'font-family': 'sans-serif',
             'color': '#252525',
@@ -81,6 +126,7 @@ class PlayerStatisticsDashboard:
         }
 
         with st.container():
+
             with elements('dashboard'):
                 # First, build a default layout for every element you want to include in your dashboard
                 layout = [
@@ -94,8 +140,10 @@ class PlayerStatisticsDashboard:
                 ]
 
                 mui.Box(
-                    'Player Name #7',
+                    f'{player}',
                     sx={
+                        'backgroundColor': '#f8f8f8',
+                        'backdrop-filter': 'blur(32px)',
                         'color': '#252525',
                         'opacity': '0.1',
                         'text-transform': 'uppercase',
@@ -121,8 +169,6 @@ class PlayerStatisticsDashboard:
                     with mui.Box(sx={
                         'padding': '.5em',
                         'backgroundColor': '#d8d9de',
-                        'backdrop-filter': 'blur(32px)',
-                        'max-width': '600px',
                         'border-radius': '5px',
                     }, key='heatmap'):
                         self.heatmap()
@@ -133,6 +179,18 @@ class PlayerStatisticsDashboard:
                         # ]
                         df = pd.DataFrame(np.random.randn(50, 20), columns=('col %d' % i for i in range(20)))
                         # self.game_log(df, 'Game Log', 100)
+
+        # st.markdown(
+        #     """
+        #         <style>
+        #             div[data-testid='stAppViewContainer'], div[data-testid='stElementContainer'] > iframe > html > body > .react-grid-layout {
+        #                 background-color: #232323;
+        #             }
+        #         </style>
+        #     """,
+        #     unsafe_allow_html=True
+        # )
+
 
     def game_log(self, df, title, height, color_df=None):
         fig = go.Figure(

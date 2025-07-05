@@ -95,7 +95,6 @@ def draw_court(ax=None, color='black', lw=1.2, outer_lines=False):
 
     # Update plot
     # plt.gca().set_facecolor('#f8f8ff')
-    plt.gca().set_facecolor('#f6e3c8')
     plt.axis('off')
     plt.subplots_adjust(left=1, right=2, top=2, bottom=1)
 
