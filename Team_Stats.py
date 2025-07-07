@@ -8,6 +8,7 @@ import sample_data
 
 from PIL import Image
 from utils import court_coordinates as cc
+from matplotlib.colors import ListedColormap
 from streamlit_option_menu import option_menu
 from streamlit_card import card
 
@@ -209,13 +210,16 @@ class Dashboard:
                 st.dataframe(shooting_stats_df, width=100000)
 
     def player_table_heatmap(self, df):
-        # heatmap = df.style.format(precision=1).background_gradient(cmap='Wistia')
-        heatmap = df.style.format(precision=1).background_gradient(cmap='summer')
+        # custom_colors = ['#ffdfbe', '#ffd1ad', '#ffc39b', '#ffb58a' ,'#ffa778', '#ff9967']
+        custom_colors = ['#f0d1f2', '#e7c3e8', '#deb5de', '#d4a7d3' ,'#db99c9']
+        custom_cmap = ListedColormap(custom_colors)
+        heatmap = df.style.format(precision=1).background_gradient(cmap=custom_cmap)
         st.dataframe(heatmap, width=100000)
 
     def shooting_table_heatmap(self, df):
-        # heatmap = df.style.format(precision=1).background_gradient(cmap='Purples')
-        heatmap = df.style.format(precision=1).background_gradient(cmap='Wistia')
+        custom_colors = ['#ffa9a9', '#ff9997', '#ff8986', '#ff7974', '#ff6962']
+        custom_cmap = ListedColormap(custom_colors)
+        heatmap = df.style.format(precision=1).background_gradient(cmap=custom_cmap)
         st.dataframe(heatmap, width=100000)
 
 
