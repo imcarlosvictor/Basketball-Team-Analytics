@@ -6,6 +6,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 
+import sample_data
+
 from PIL import Image
 from io import BytesIO
 from numpy import sin, cos, pi
@@ -46,21 +48,6 @@ class PlayerStatisticsDashboard:
                 'Season 1',
             ]
             selected_option = st.sidebar.selectbox('Season', options)
-
-        # with st.sidebar:
-        #     options = [
-        #         'David',
-        #         'Josh',
-        #         'Jake',
-        #         'Noel',
-        #         'John',
-        #         'James',
-        #         'Marcus',
-        #         'Ricky',
-        #         'Harry',
-        #         'Jeff',
-        #     ]
-        #     selected_option = st.sidebar.selectbox('Player', options)
 
     def season_selection(self):
         with st.container(border=False):
@@ -126,17 +113,12 @@ class PlayerStatisticsDashboard:
         }
 
         with st.container():
-
             with elements('dashboard'):
                 # First, build a default layout for every element you want to include in your dashboard
                 layout = [
                     # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
                     dashboard.Item('radar_graph', 0, 0, 4, 4, isResizable=False, isDraggable=False, moved=False),
                     dashboard.Item('line_graph', 4, 0, 8, 4, isResizable=False, isDraggable=False, moved=False),
-                    dashboard.Item('career_stats', 0, 5, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
-                    dashboard.Item('season_stats', 0, 9, 4, 2.4, isResizable=False, isDraggable=False, moved=False),
-                    dashboard.Item('heatmap', 0, 13, 4, 3, isResizable=False, isDraggable=False, moved=False),
-                    dashboard.Item('game_log', 4, 0, 8, 10.0, isResizable=False, isDraggable=False, moved=False),
                 ]
 
                 mui.Box(
@@ -160,92 +142,34 @@ class PlayerStatisticsDashboard:
                     with mui.Box(sx=card_theme, key='line_graph'):
                         self.line_graph()
 
-                    with mui.Box(sx=left_coloumn_card_theme, key='career_stats'):
-                        self.career_stats()
+        with st.container():
+            col1, col2 = st.columns([1,2])
+            with col1:
+                self.season_stats()
+                self.career_stats()
+            with col2:
+                self.create_game_log()
 
-                    with mui.Box(sx=left_coloumn_card_theme, key='season_stats'):
-                        self.season_stats()
+    def collect_data(self):
+        player_sample_data = sample_data.player_sample_data()
+        player_stats = pd.DataFrame.from_records(player_sample_data)
 
-                    with mui.Box(sx={
-                        'padding': '.5em',
-                        'backgroundColor': '#d8d9de',
-                        'border-radius': '5px',
-                    }, key='heatmap'):
-                        self.heatmap()
+        shooting_sample_data = sample_data.shooting_sample_data()
+        shooting_stats = pd.DataFrame.from_records(shooting_sample_data)
 
-                    with mui.Box(sx=card_theme, key='game_log'):
-                        # df = [
-                        #     ['date','opp','result','fg','fg%','2p','2p%','3p','3p%','ft','ft%','reb','ast','blk','stl','to','pts'],
-                        # ]
-                        df = pd.DataFrame(np.random.randn(50, 20), columns=('col %d' % i for i in range(20)))
-                        # self.game_log(df, 'Game Log', 100)
+        return player_stats, shooting_stats
 
-        # st.markdown(
-        #     """
-        #         <style>
-        #             div[data-testid='stAppViewContainer'], div[data-testid='stElementContainer'] > iframe > html > body > .react-grid-layout {
-        #                 background-color: #232323;
-        #             }
-        #         </style>
-        #     """,
-        #     unsafe_allow_html=True
-        # )
-
-
-    def game_log(self, df, title, height, color_df=None):
-        fig = go.Figure(
-            data = [
-                go.Table(
-                    header=dict(
-                        values=df.columns,
-                        font=dict(size=12, color='white'),
-                        fill_color='#8a97eb',
-                        line_color='#232323',
-                        align=['left', 'center'],
-                        height=30
-                    ),
-                    cells=dict(
-                        values=[df[K].tolist() for K in df.columns],
-                        font=dict(size=12),
-                        align=['left','center'],
-                        # fill_color=[color_df[K].tolist() for K in color_df.columns],
-                        # line_color=[color_df[K].tolist() for K in color_df.columns],
-                        height=20
-                    )
-                )
-            ]
-        )
-        fig.update_layout(
-            title_text=title,
-            title_font_color='white',
-            title_x=0,
-            margin=dict(l=0,r=10,b=20,t=30),
-            height=height
-        )
-
-    def career_stats(self):
-        career_data = {
-            'pts': 15.3,
-            'ast': 2.1,
-            'stl': 3.1,
-            'blk': 3.1,
-            'orb': 5.6,
-            'drb': 8.2,
-            'foul': 3,
-            'tur': 2,
-            'fg': 6.5,
-            'fg%': 45.6,
-            'ft': 5.3,
-            'ft%': 75.2,
-            '2p': 5.7,
-            '2p%': 41.6,
-            '3p': 4.1,
-            '3p%': 32.2,
-        }
-        self.grid_statistics('career statistics', career_data)
+    def create_game_log(self):
+        # Data
+        player_stats_df, shooting_stats_df = self.collect_data()
+        # Container for tables
+        container = st.container(border=False)
+        with container:
+            # Player tables
+            st.dataframe(player_stats_df, width=100000)
 
     def season_stats(self):
-        season_data = {
+        data = {
             'pts': 25.3,
             'ast': 2.1,
             'stl': .7,
@@ -263,217 +187,100 @@ class PlayerStatisticsDashboard:
             '3p': 3.1,
             '3p%': 43.2,
         }
-        self.grid_statistics('season statistics', season_data)
 
-    def grid_statistics(self, block_title: str, data):
-        html.div(
-            block_title,
-            css={
-                'padding': '.5em .4em .1em .7em',
-                'margin-left': '1em',
-                'margin-right': '1.8em',
-                'border-bottom': 'solid .7px #232323',
-                'color': '#232323',
-                'display': 'grid',
-                'justify-content': 'start',
-                'align-items': 'end',
-                'text-transform': 'uppercase',
-                'font-family': 'sans-serif',
-                # 'font-weight': 'bold',
-                'font-size': '15px',
-            }
-        )
+        with st.container():
+            st.markdown('###### Season Stats')
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.metric(label='PTS', value=data['pts'], delta=+2.2, delta_color='normal')
+                st.metric(label='ORB', value=data['orb'], delta=+2.2, delta_color='normal')
+                st.metric(label='FG', value=data['fg'], delta=+2.2, delta_color='normal')
+                st.metric(label='2P', value=data['2p'], delta=+2.2, delta_color='normal')
+            with col2:
+                st.metric(label='AST', value=data['ast'], delta=+2.2, delta_color='normal')
+                st.metric(label='DRB', value=data['drb'], delta=+2.2, delta_color='normal')
+                st.metric(label='FG%', value=data['fg'], delta=+2.2, delta_color='normal')
+                st.metric(label='2P%', value=data['2p%'], delta=+2.2, delta_color='normal')
+            with col3:
+                st.metric(label='STL', value=data['stl'], delta=+2.2, delta_color='normal')
+                st.metric(label='FOUL', value=data['foul'], delta=+2.2, delta_color='normal')
+                st.metric(label='FT', value=data['ft'], delta=+2.2, delta_color='normal')
+                st.metric(label='3P', value=data['3p'], delta=+2.2, delta_color='normal')
+            with col4:
+                st.metric(label='BLK', value=data['blk'], delta=+2.2, delta_color='normal')
+                st.metric(label='TUR', value=data['tur'], delta=+2.2, delta_color='normal')
+                st.metric(label='FT%', value=data['ft%'], delta=+2.2, delta_color='normal')
+                st.metric(label='3P%', value=data['3p%'], delta=+2.2, delta_color='normal')
+            with col5:
+                st.metric(label='Effective FG%', value=5.7, delta=+2.2, delta_color='normal')
+                st.metric(label='Turnover Ratio', value=41.6, delta=+2.2, delta_color='normal')
+                st.metric(label='ORB %', value=4.1, delta=+2.2, delta_color='normal')
+                st.metric(label='FT Ratio', value=32.2, delta=+2.2, delta_color='normal')
 
-        with elements('statistics_overview_dashboard'):
-            BOX_CSS = {
-                'p': 0,
-                'display': 'flex',
-                'flex-direction': 'column',
-                'justify-content': 'center',
-                'align-items': 'center',
-                ':hover': {
-                    'background': '#d8d9de',
-                }
-            }
+    def career_stats(self):
+        data = {
+            'pts': 15.3,
+            'ast': 2.1,
+            'stl': 3.1,
+            'blk': 3.1,
+            'orb': 5.6,
+            'drb': 8.2,
+            'foul': 3,
+            'tur': 2,
+            'fg': 6.5,
+            'fg%': 45.6,
+            'ft': 5.3,
+            'ft%': 75.2,
+            '2p': 5.7,
+            '2p%': 41.6,
+            '3p': 4.1,
+            '3p%': 32.2,
+        }
 
-            FFI_BOX_CSS = {
-                'p': 0,
-                'display': 'flex',
-                'radius': 3,
-                'flex-direction': 'column',
-                'justify-content': 'center',
-                'align-items': 'center',
-                'background': '#d8d9de',
-            }
+        st.markdown(
+            """
+                <style>
+                    [data-testid="stMetricLabel"] {
+                        font-size: 12px;
+                            
+                    }
+                        
+                    [data-testid="stMetricValue"] {
+                        font-size: 25px;
+                            
+                    }
+                </style>
+            """, unsafe_allow_html=True
+            )
 
-            TITLE_CSS = {
-                'color': '#232323',
-                'font-size': 15,
-            }
-
-            FFI_TITLE_CSS = {
-                # 'overflow-wrap': 'break-word',
-                # 'inline-size': 110,
-                'word-break': 'break-all',
-                'color': '#232323',
-                'font-size': 11,
-                'padding-bottom': '.5em',
-            }
-
-            VALUE_CSS = {
-                'color': '#101010',
-                'font-size': 22,
-                'font-weight': 'medium',
-            }
-
-            GAIN_DELTA_CSS = {
-                'color': '#16a68e',
-                'font-size': 14,
-                'font-weight': 'bold',
-            }
-
-            LOSS_DELTA_CSS = {
-                'color': '#ff1400',
-                'font-size': 14,
-                'font-weight': 'bold',
-            }
-
-            # First, build a default layout for every element you want to include in your dashboard
-            layout = [
-                # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
-                # ROW 1
-                dashboard.Item('PTS', 0, 0, .7, .5, isResizable=False, isDraggable=False, isBounded=True),
-                dashboard.Item('AST', .7, 0, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('STL', 1.4, 0, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('BLK', 2.1, 0, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('EFGP', 2.8, 0, 1, .5, isResizable=False, isDraggable=False, moved=False), # FOUR FACTOR INDEX
-                # ROW 2
-                dashboard.Item('ORB', 0, .5, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('DRB', .7, .5, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('FOUL', 1.4, .5, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('TUR', 2.1, .5, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('TURR', 2.8, .5, 1, .5, isResizable=False, isDraggable=False, moved=False), # FOUR FACTOR INDEX
-                # ROW 3
-                dashboard.Item('FG', 0, 1, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('FG%', .7, 1, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('FT', 1.4, 1, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('FT%', 2.1, 1, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('ORB%', 2.8, 1, 1, .5, isResizable=False, isDraggable=False, moved=False), # FOUR FACTOR INDEX
-                # ROW 4
-                dashboard.Item('2P', 0, 1.5, .7, .5, isResizable=False, isDraggable=True, moved=False),
-                dashboard.Item('2P%', .7, 1.5, .7, .5, isResizable=False, isDraggable=True, moved=False),
-                dashboard.Item('3P', 1.4, 1.5, .7, .5, isResizable=False, isDraggable=True, moved=False),
-                dashboard.Item('3P%', 2.1, 1.5, .7, .5, isResizable=False, isDraggable=False, moved=False),
-                dashboard.Item('FTR', 2.8, 1.5, 1, .5, isResizable=False, isDraggable=False, moved=False), # FOUR FACTOR INDEX
-            ]
-
-            with dashboard.Grid(layout, autoSize=True, margin=[0,0], containerPadding=[0,0]):
-                # ----------------- ROW 1 -----------------
-                with mui.Box(key='PTS', sx=BOX_CSS):
-                    mui.Box('PTS', sx=TITLE_CSS)
-                    mui.Box(data['pts'], sx=VALUE_CSS)
-                    mui.Box('+2.2', sx=GAIN_DELTA_CSS)
-
-                with mui.Box(key='AST', sx=BOX_CSS):
-                    mui.Box('AST', sx=TITLE_CSS)
-                    mui.Box(data['ast'], sx=VALUE_CSS)
-                    mui.Box('+0.6', sx=LOSS_DELTA_CSS)
-
-                with mui.Box(key='STL', sx=BOX_CSS):
-                    mui.Box('STL', sx=TITLE_CSS)
-                    mui.Box(data['stl'], sx=VALUE_CSS)
-
-                with mui.Box(key='BLK', sx=BOX_CSS):
-                    mui.Box('BLK', sx=TITLE_CSS)
-                    mui.Box(data['blk'], sx=VALUE_CSS)
-
-                with mui.Box(key='EFGP', sx=FFI_BOX_CSS): # FOUR FACTOR INDEX
-                    mui.Box('Effective FG%', sx=FFI_TITLE_CSS)
-                    mui.Box(data['2p'], sx=VALUE_CSS)
-
-            # ----------------- ROW 2 -----------------
-            with dashboard.Grid(layout, margin=[0,0]):
-                with mui.Box(key='ORB', sx=BOX_CSS):
-                    mui.Box('ORB', sx=TITLE_CSS)
-                    mui.Box(data['orb'], sx=VALUE_CSS)
-                    mui.Box('+2.2', sx=GAIN_DELTA_CSS)
-
-                with mui.Box(key='DRB', sx=BOX_CSS):
-                    mui.Box('DRB', sx=TITLE_CSS)
-                    mui.Box(data['drb'], sx=VALUE_CSS)
-
-                with mui.Box(key='FOUL', sx=BOX_CSS):
-                    mui.Box('FOUL', sx=TITLE_CSS)
-                    mui.Box(data['foul'], sx=VALUE_CSS)
-
-                with mui.Box(key='TUR', sx=BOX_CSS):
-                    mui.Box('TUR', sx=TITLE_CSS)
-                    mui.Box(data['tur'], sx=VALUE_CSS)
-
-                with mui.Box(key='TURR', sx=FFI_BOX_CSS): # FOUR FACTOR INDEX
-                    mui.Box('Turnover Ratio', sx=FFI_TITLE_CSS)
-                    mui.Box(data['2p%'], sx=VALUE_CSS)
-
-            # ----------------- ROW 3 -----------------
-            with dashboard.Grid(layout, margin=[0,0]):
-                with mui.Box(key='FG', sx=BOX_CSS):
-                    mui.Box('FG', sx=TITLE_CSS)
-                    mui.Box(data['fg'], sx=VALUE_CSS)
-
-                with mui.Box(key='FG%', sx=BOX_CSS):
-                    mui.Box('FG%', sx=TITLE_CSS)
-                    mui.Box(data['fg%'], sx=VALUE_CSS)
-
-                with mui.Box(key='FT', sx=BOX_CSS):
-                    mui.Box('FT', sx=TITLE_CSS)
-                    mui.Box(data['ft'], sx=VALUE_CSS)
-
-                with mui.Box(key='FT%', sx=BOX_CSS):
-                    mui.Box('FT%', sx=TITLE_CSS)
-                    mui.Box(data['ft%'], sx=VALUE_CSS)
-
-                with mui.Box(key='ORB%', sx=FFI_BOX_CSS): # FOUR FACTOR INDEX
-                    mui.Box('Offensive Rebound %', sx=FFI_TITLE_CSS)
-                    mui.Box(data['3p'], sx=VALUE_CSS)
-
-            # ----------------- ROW 4 -----------------
-            with dashboard.Grid(layout, margin=[0,0]):
-                with mui.Box(key='2P', sx=BOX_CSS):
-                    mui.Box('2P', sx=TITLE_CSS)
-                    mui.Box(data['2p'], sx=VALUE_CSS)
-
-                with mui.Box(key='2P%', sx=BOX_CSS):
-                    mui.Box('2P%', sx=TITLE_CSS)
-                    mui.Box(data['2p%'], sx=VALUE_CSS)
-
-                with mui.Box(key='3P', sx=BOX_CSS):
-                    mui.Box('3P', sx=TITLE_CSS)
-                    mui.Box(data['3p'], sx=VALUE_CSS)
-
-                with mui.Box(key='3P%', sx=BOX_CSS):
-                    mui.Box('3P%', sx=TITLE_CSS)
-                    mui.Box(data['3p%'], sx=VALUE_CSS)
-
-                with mui.Box(key='FTR', sx=FFI_BOX_CSS): # FOUR FACTOR INDEX
-                    mui.Box('Free Throw Ratio', sx=FFI_TITLE_CSS)
-                    mui.Box(data['3p%'], sx=VALUE_CSS)
-
-        html.div(
-            '4-Factors Index: 28.5',
-            css={
-                'margin-bottom': '1em',
-                'padding': '.5em 2.3em .5em .5em',
-                # 'backgroundColor': '#dfdfdf',
-                'color': '#232323',
-                'display': 'grid',
-                'justify-content': 'end',
-                'align-items': 'start',
-                'text-transform': 'uppercase',
-                'font-family': 'sans-serif',
-                'font-style': 'italic',
-                'font-size': '14px',
-            }
-        )
+        with st.container():
+            st.markdown('###### Career Stats')
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.metric(label='PTS', value=data['pts'], delta=+2.2, delta_color='normal')
+                st.metric(label='ORB', value=data['orb'], delta=+2.2, delta_color='normal')
+                st.metric(label='FG', value=data['fg'], delta=+2.2, delta_color='normal')
+                st.metric(label='2P', value=data['2p'], delta=+2.2, delta_color='normal')
+            with col2:
+                st.metric(label='AST', value=data['ast'], delta=+2.2, delta_color='normal')
+                st.metric(label='DRB', value=data['drb'], delta=+2.2, delta_color='normal')
+                st.metric(label='FG%', value=data['fg'], delta=+2.2, delta_color='normal')
+                st.metric(label='2P%', value=data['2p%'], delta=+2.2, delta_color='normal')
+            with col3:
+                st.metric(label='STL', value=data['stl'], delta=+2.2, delta_color='normal')
+                st.metric(label='FOUL', value=data['foul'], delta=+2.2, delta_color='normal')
+                st.metric(label='FT', value=data['ft'], delta=+2.2, delta_color='normal')
+                st.metric(label='3P', value=data['3p'], delta=+2.2, delta_color='normal')
+            with col4:
+                st.metric(label='BLK', value=data['blk'], delta=+2.2, delta_color='normal')
+                st.metric(label='TUR', value=data['tur'], delta=+2.2, delta_color='normal')
+                st.metric(label='FT%', value=data['ft%'], delta=+2.2, delta_color='normal')
+                st.metric(label='3P%', value=data['3p%'], delta=+2.2, delta_color='normal')
+            with col5:
+                st.metric(label='Effective FG%', value=5.7, delta=+2.2, delta_color='normal')
+                st.metric(label='Turnover Ratio', value=41.6, delta=+2.2, delta_color='normal')
+                st.metric(label='ORB %', value=4.1, delta=+2.2, delta_color='normal')
+                st.metric(label='FT Ratio', value=32.2, delta=+2.2, delta_color='normal')
 
     def line_graph(self):
         with elements('line_graph'):
