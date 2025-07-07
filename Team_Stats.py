@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+import sample_data
 
 from PIL import Image
 from utils import court_coordinates as cc
@@ -31,15 +32,6 @@ class Dashboard:
     def season_selection(self):
         with st.container(border=False):
             left, middle, right = st.columns(3, vertical_alignment="bottom")
-
-            # with left:
-            #     options = ['Average Joe', 'RiseUp']
-            #     selection = st.pills('League', options, selection_mode='single', default='Average Joe')
-
-            # with middle:
-            #     options = ['1', '2', '3']
-            #     selection = st.pills('Season', options, selection_mode='single', default='1')
-
             with left:
                 options = ['Average Joe', 'RiseUp']
                 selection = st.segmented_control("League", options, selection_mode="single", default='Average Joe')
@@ -52,173 +44,180 @@ class Dashboard:
 
     def create_dashboard(self):
         self.season_selection()
+        self.create_team_leaders_table()
+        self.create_player_table_stats()
+        self.create_shooting_table_stats()
+
+    def collect_data(self):
+        player_sample_data = sample_data.player_sample_data()
+        player_stats = pd.DataFrame.from_records(player_sample_data)
+
+        shooting_sample_data = sample_data.shooting_sample_data()
+        shooting_stats = pd.DataFrame.from_records(shooting_sample_data)
+
+        return player_stats, shooting_stats
+
+    def get_team_leader_stats(self):
+        player_stats_df, shooting_stats_df = self.collect_data()
+
+        data = {
+            'PTS_leader': '',
+            'leading_PTS_stat': 0,
+            'FG_leader': '',
+            'leading_FG_stat': 0,
+            'REB_leader': '',
+            'leading_REB_stat': 0,
+            'AST_leader': '',
+            'leading_AST_stat': 0,
+            'STL_leader': '',
+            'leading_STL_stat': 0,
+            'BLK_leader': '',
+            'leading_BLK_stat': 0,
+        }
+
+        shooting_stat_list = shooting_stats_df.to_dict(orient='records')
+        for dict_item in shooting_stat_list:
+            if dict_item['FG%'] > data['leading_FG_stat']:
+                data['leading_FG_stat'] = dict_item['FG%']
+                data['FG_leader'] = dict_item['Name']
+
+        player_stat_list = player_stats_df.to_dict(orient='records')
+        for dict_item in player_stat_list:
+            if dict_item['PTS'] > data['leading_PTS_stat']:
+                data['leading_PTS_stat'] = dict_item['PTS']
+                data['PTS_leader'] = dict_item['Name']
+
+            if dict_item['REB'] > data['leading_REB_stat']:
+                data['leading_REB_stat'] = dict_item['REB']
+                data['REB_leader'] = dict_item['Name']
+
+            if dict_item['AST'] > data['leading_AST_stat']:
+                data['leading_AST_stat'] = dict_item['AST']
+                data['AST_leader'] = dict_item['Name']
+
+            if dict_item['STL'] > data['leading_STL_stat']:
+                data['leading_STL_stat'] = dict_item['STL']
+                data['STL_leader'] = dict_item['Name']
+
+            if dict_item['BLK'] > data['leading_BLK_stat']:
+                data['leading_BLK_stat'] = dict_item['BLK']
+                data['BLK_leader'] = dict_item['Name']
+
+        return data
+
+    def create_team_leaders_table(self):
+        data = self.get_team_leader_stats()
 
         leading_stats_container = st.container()
         col_1, col_2, col_3, col_4, col_5, col_6 = st.columns(6)
+
+        # CSS to hide delta arrow
+        st.write(
+            """
+                <style>
+                    [data-testid="stMetricDelta"] svg {
+                    display: none;
+            }
+                </style>
+            """,
+            unsafe_allow_html=True,
+        )
 
         with leading_stats_container:
             # Leading Overall Statistics
             st.markdown('###### Team Leaders')
 
             with col_1:
-                with st.container(border=True):
-                    st.markdown('### Points')
-                    st.text('<player name>')
-
+                with st.container(border=False):
+                    st.metric(
+                        label='**points**', 
+                        value=f'{data["leading_PTS_stat"]}', 
+                        delta=f'{data["PTS_leader"]}',
+                        delta_color='inverse',
+                    )
             with col_2:
-                with st.container(border=True):
-                    st.markdown('### FG%')
-                    st.text('<player name>')
-
+                with st.container(border=False):
+                    st.metric(
+                        label='**FG%**', 
+                        value=f'{data["leading_FG_stat"]}', 
+                        delta=f'{data["FG_leader"]}',
+                        delta_color='inverse',
+                    )
             with col_3:
                 # card_2 = st.container(border=True)
-                with st.container(border=True):
-                    st.subheader('Rebounds')
-                    st.text('<player name>')
-
+                with st.container(border=False):
+                    st.metric(
+                        label='**rebounds**', 
+                        value=f'{data["leading_REB_stat"]}', 
+                        delta=f'{data["REB_leader"]}',
+                        delta_color='inverse',
+                    )
             with col_4:
-                with st.container(border=True):
-                    st.subheader('Assists')
-                    st.text('<player name>')
-
+                with st.container(border=False):
+                    st.metric(
+                        label='**assists**', 
+                        value=f'{data["leading_AST_stat"]}', 
+                        delta=f'{data["AST_leader"]}',
+                        delta_color='inverse',
+                    )
             with col_5:
-                with st.container(border=True):
-                    st.subheader('Steals')
-                    st.text('<player name>')
-
+                with st.container(border=False):
+                    st.metric(
+                        label='**steals**', 
+                        value=f'{data["leading_STL_stat"]}', 
+                        delta=f'{data["STL_leader"]}',
+                        delta_color='inverse',
+                    )
             with col_6:
-                with st.container(border=True):
-                    st.subheader('Blocks')
-                    st.text('<player name>')
+                with st.container(border=False):
+                    st.metric(
+                        label='**blocks**', 
+                        value=f'{data["leading_BLK_stat"]}', 
+                        delta=f'{data["BLK_leader"]}',
+                        delta_color='inverse',
+                    )
 
-        self.player_table_stats()
-        self.shooting_table_stats()
-
-
-    def game_logs(self):
-        pass
+        st.markdown('######')
 
     def player_comparison(self):
         pass
 
-    def player_table_stats(self):
+    def create_player_table_stats(self):
         # Data
-        sample_data = self.sample_data()
-        df = pd.DataFrame.from_records(sample_data)
-
+        player_stats_df, shooting_stats_df = self.collect_data()
         # Container for tables
         container = st.container(border=False)
         with container:
-            st.write('###### Player Stats')
-
             # Player tables
-            st.dataframe(df, width=100000)
-            self.player_table_heatmap(df)
+            on = st.toggle('Player Stats Heatmap')
+            if on:
+                self.player_table_heatmap(player_stats_df)
+            else:
+                st.dataframe(player_stats_df, width=100000)
+
+    def create_shooting_table_stats(self):
+        # Data
+        player_stats_df, shooting_stats_df = self.collect_data()
+        # Container for tables
+        container = st.container(border=False)
+        with container:
+            # Player tables
+            on = st.toggle('Shooting Stats Heatmap')
+            if on:
+                self.shooting_table_heatmap(shooting_stats_df)
+            else:
+                st.dataframe(shooting_stats_df, width=100000)
 
     def player_table_heatmap(self, df):
-        heatmap = df.style.format(precision=1).background_gradient(cmap='Wistia')
+        # heatmap = df.style.format(precision=1).background_gradient(cmap='Wistia')
+        heatmap = df.style.format(precision=1).background_gradient(cmap='summer')
         st.dataframe(heatmap, width=100000)
-
-    def shooting_table_stats(self):
-        # Data
-        sample_data = self.sample_data()
-        df = pd.DataFrame.from_records(sample_data)
-
-        # Container for tables
-        container = st.container(border=False)
-        with container:
-            st.write('###### Shooting Stats')
-
-            # Player tables
-            st.dataframe(df, width=100000)
-            self.shooting_table_heatmap(df)
-
 
     def shooting_table_heatmap(self, df):
+        # heatmap = df.style.format(precision=1).background_gradient(cmap='Purples')
         heatmap = df.style.format(precision=1).background_gradient(cmap='Wistia')
         st.dataframe(heatmap, width=100000)
 
-    def sample_data(self):
-        sample_data = [{
-            'Name': 'Liesa McMinn',
-            'GP': 23,
-            'PTS': 21.3,
-            'OR': 5.3,
-            'DR': 2.2,
-            'REB': 8.4,
-            'AST': 1.3,
-            'STL': 1.1,
-            'BLK': 2.7,
-            'TO': 0.8,
-        }, {
-            'Name': 'Augusta Yansons',
-            'GP': 23,
-            'PTS': 12.3,
-            'OR': 1.2,
-            'DR': 4.2,
-            'REB': 5.4,
-            'AST': 3.5,
-            'STL': 3.3,
-            'BLK': 2.7,
-            'TO': 3.0,
-        }, {
-            'Name': 'Errick Lingner',
-            'GP': 23,
-            'PTS': 12.3,
-            'OR': 1.2,
-            'DR': 4.2,
-            'REB': 7.4,
-            'AST': 1.5,
-            'STL': 1.3,
-            'BLK': 0.8,
-            'TO': 5.1,
-        }, {
-            'Name': 'Suki Roderham',
-            'GP': 23,
-            'PTS': 10.3,
-            'OR': 3.2,
-            'DR': 0.2,
-            'REB': 3.0,
-            'AST': 0.9,
-            'STL': 1.0,
-            'BLK': 3.1,
-            'TO': 0.2,
-        }, {
-            'Name': 'Tarrah Gatehouse',
-            'GP': 23,
-            'PTS': 12.3,
-            'OR': 1.2,
-            'DR': 4.2,
-            'REB': 5.4,
-            'AST': 3.5,
-            'STL': 1.3,
-            'BLK': 2.7,
-            'TO': 3.0,
-        }, {
-            'Name': 'Roland Goane',
-            'GP': 23,
-            'PTS': 12.3,
-            'OR': 1.2,
-            'DR': 4.2,
-            'REB': 5.4,
-            'AST': 3.5,
-            'STL': 1.3,
-            'BLK': 2.7,
-            'TO': 3.0,
-        }, {
-            'Name': 'Trude Greenham',
-            'GP': 23,
-            'PTS': 12.3,
-            'OR': 1.2,
-            'DR': 4.2,
-            'REB': 5.4,
-            'AST': 3.5,
-            'STL': 1.3,
-            'BLK': 2.7,
-            'TO': 3.0,
-        }] 
-
-        return sample_data
 
 
 def main():
