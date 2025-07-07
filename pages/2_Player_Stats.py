@@ -65,25 +65,37 @@ class PlayerStatisticsDashboard:
                 season = st.segmented_control("Season", options, selection_mode="single", default='1')
 
             # Players
-            left_2, middle_2 = st.columns(2, vertical_alignment='bottom')
-            with left_2:
-                options = [
-                    'David Perez',
-                    'Josh',
-                    'Jake',
-                    'Noel Ramos',
-                    'John',
-                    'James Perez',
-                    'Marcus',
-                    'Ricky',
-                    'Harry',
-                    'Jeff',
-                    'James',
-                    'Marcus',
-                    'Ricky',
-                    'Harry',
-                ]
-                player = st.segmented_control('Player', options, selection_mode='single', default='David Perez')
+            col1, col2 = st.columns([2,1])
+            with col1:
+                option_map = {
+                    0: 'David Perez',
+                    1: 'Josh',
+                    2: 'Jake',
+                    3: 'Noel Ramos',
+                    4: 'John',
+                    5: 'James Perez',
+                    6: 'Marcus',
+                    7: 'Ricky',
+                    8: 'Harry',
+                    9: 'Jeff',
+                    10: 'James',
+                    11: 'Marcus',
+                    12: 'Ricky',
+                    14: 'Harry',
+                }
+
+                selection = st.pills(
+                        "Players",
+                        options=option_map.keys(),
+                        format_func=lambda option: option_map[option],
+                        selection_mode="single",
+                    
+                )
+                st.write(
+                        "Your selected option: "
+                        f"{None if selection is None else option_map[selection]}"
+                    
+                )
             st.markdown('#####') # Margin bottom space
 
         return league, season, player
