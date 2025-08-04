@@ -1,110 +1,337 @@
+import pandas as pd
+import numpy as np
 import streamlit as st
 import plotly.express as px
-import pandas as pd
-from PIL import Image
-from streamlit_extras.stylable_container import stylable_container
+import matplotlib.pyplot as plt
 
+from PIL import Image
 from utils import court_coordinates as cc
+from matplotlib.colors import ListedColormap
+from streamlit_extras.stylable_container import stylable_container
 from modules.basketball_court import draw_court
+
+from modules.team_leaders import *
+
+# from mplbasketball import Court
+# from mplbasketball.utils import transform
 
 
 class GameStatisticsDashboard:
     def __init__(self):
         favicon = Image.open('./assests/basketball.png')
         st.set_page_config(
-            page_title='Game Analysis',
+            page_title='Game Report',
             page_icon=favicon,
             layout='wide',
         )
-        draw_court()
         # Uppercase all text
-        st.markdown(
-            '<style> body { text-transform: uppercase; } </style>',
-            unsafe_allow_html=True
-        )
+        st.markdown('<style> body { text-transform: uppercase; } </style>', unsafe_allow_html=True)
+        self.create_game_stat_dashboard()
 
-    def create_sidebar(self):
-        # Sidebar
-        with st.sidebar:
-            options = [
-                'AverageJoe',
-                'RiseUp',
-            ]
-            selected_option = st.sidebar.selectbox('League', options)
+    def create_game_stat_dashboard(self):
+        self.create_filter_search()
+        self.embedded_video_slider()
+        self.create_game_summary()
+        self.create_tabs()
+        # self.plot_basketball_court()
+        # self.plot_shot_chart()
 
-            if selected_option == 'AverageJoe':
-                with st.sidebar:
-                    options = [
-                        'Season 1',
-                    ]
-                    selected_option = st.sidebar.selectbox('Season', options)
+    def create_tabs(self):
+        tab1, tab2, tab3 = st.tabs(['Box Score', 'Team Stats', 'Shot Chart',])
+        with tab1:
+            create_team_leaders_table()
+            self.create_home_team_stats()
+            self.create_away_team_stats()
+        with tab2:
+            self.create_team_stats_dataframe()
 
-                with st.sidebar:
-                    options = [
-                        'Game 1  | BWB vs. Venoms',
-                        'Game 2  | BWB vs. ABG',
-                        'Game 3  | BWB vs. GoEasy',
-                        'Game 4  | BWB vs. --',
-                        'Game 5  | BWB vs. --',
-                        'Game 6  | BWB vs. --',
-                        'Game 7  | BWB vs. --',
-                        'Game 8  | BWB vs. --',
-                        'Game 9  | BWB vs. --',
-                        'Game 10 | BWB vs. --',
-                        'Game 11 | BWB vs. --',
-                        'Game 12 | BWB vs. --',
-                        'Game 13 | BWB vs. --',
-                        'Game 14 | BWB vs. --',
-                    ]
-                    selected_option = st.sidebar.selectbox('Game', options)
+    def create_filter_search(self):
+        with st.container():
+            user_choice = ''
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                league = st.selectbox(
+                    'League',
+                    (
+                        'AverageJoes',
+                        'RiseUp',
+                    ),
+                    index=None,
+                )
+            with col2:
+                season = st.selectbox(
+                    'Season',
+                    (
+                        'Winter 2024',
+                        'Summer 2025',
+                    ),
+                    index=None,
+                )
+            with col3:
+                game = st.selectbox(
+                    'Game',
+                    (
+                        'Game 1: ABG',
+                        'Game 2: CL Warriors',
+                    ),
+                    index=None,
+                )
 
-                with st.sidebar:
-                    options = [
-                        'Team vs Team',
-                        'David',
-                        'Josh',
-                        'Jake',
-                        'Noel',
-                        'John',
-                        'James',
-                        'Marcus',
-                        'Ricky',
-                    ]
-                    selected_option = st.sidebar.selectbox('Focus', options)
+        st.divider()
 
-            elif selected_option == 'RiseUp':
-                with st.sidebar:
-                    options = [
-                        'Season 2',
-                    ]
-                    selected_option = st.sidebar.selectbox('Season', options)
+    def embedded_video_slider(self):
+        """From filter search, find the video on youtube page."""
 
-                with st.sidebar:
-                    options = [
-                        'Game 1  | BWB vs. --',
-                        'Game 2  | BWB vs. --',
-                        'Game 3  | BWB vs. --',
-                        'Game 4  | BWB vs. --',
-                        'Game 5  | BWB vs. --',
-                        'Game 6  | BWB vs. --',
-                        'Game 7  | BWB vs. --',
-                        'Game 8  | BWB vs. --',
-                    ]
-                    selected_option = st.sidebar.selectbox('Game', options)
+        VIDEO_URL = 'https://www.youtube.com/watch?v=ZQ1dfAVO910'
+        with st.expander('Game'):
+            st.video(VIDEO_URL)
+            
+    def create_game_summary(self):
+        with st.container():
+            col1, col2, col3 = st.columns([2,1,2])
 
-                with st.sidebar:
-                    options = [
-                        'Team vs. Team',
-                        'David',
-                        'Josh',
-                        'Jake',
-                        'Noel',
-                        'John',
-                        'James',
-                        'Marcus',
-                        'Ricky',
-                    ]
-                    selected_option = st.sidebar.selectbox('Focus', options)
+            with col1:
+                st.text('Bros w/ Benefits')
+                st.write("""<style>
+                    [data-testid='stVerticalBlock']
+                    [data-testid='stVerticalBlockBorderWrapper']:nth-child(1) {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    [data-testid='stVerticalBlockBorderWrapper'] 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stHorizontalBlock'] 
+                    [data-testid='stColumn']:nth-child(1) {
+                        display: grid;
+                        justify-content: right;
+                        align-items: end;
+                    }
+
+                    [data-testid='stVerticalBlockBorderWrapper'] 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stHorizontalBlock'] 
+                    [data-testid='stColumn']:nth-child(1) 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stElementContainer']:nth-child(1) 
+                    [data-testid='stText'] {
+                        font-size: 30px;
+                        font-weight: bold;
+                        text-align: right;
+                    }
+                    </style>""", unsafe_allow_html=True)
+
+            with col2:
+                st.text('36-28')
+                st.write("""<style>
+                    [data-testid='stVerticalBlock']
+                    [data-testid='stVerticalBlockBorderWrapper']:nth-child(1) {
+                        width: 100%;
+                        # height: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    [data-testid='stVerticalBlockBorderWrapper'] 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stHorizontalBlock'] 
+                    [data-testid='stColumn']:nth-child(2) {
+                        display: grid;
+                        justify-content: center;
+                        align-items: end;
+                    }
+
+                    [data-testid='stVerticalBlockBorderWrapper'] 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stHorizontalBlock'] 
+                    [data-testid='stColumn']:nth-child(2) 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stElementContainer']:nth-child(1) 
+                    [data-testid='stText'] {
+                        font-size: 50px;
+                        font-weight: bold;
+                    }
+                    </style>""", unsafe_allow_html=True)
+
+            with col3:
+                st.text('CL Warriors')
+                st.write("""<style>
+                    [data-testid='stVerticalBlock']
+                    [data-testid='stVerticalBlockBorderWrapper']:nth-child(1) {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    [data-testid='stVerticalBlockBorderWrapper'] 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stHorizontalBlock'] 
+                    [data-testid='stColumn']:nth-child(3) {
+                        display: grid;
+                        justify-content: left;
+                        align-items: end;
+                    }
+
+                    [data-testid='stVerticalBlockBorderWrapper'] 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stHorizontalBlock'] 
+                    [data-testid='stColumn']:nth-child(3) 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stElementContainer']:nth-child(1) 
+                    [data-testid='stText'] {
+                        font-size: 30px;
+                        font-weight: bold;
+                        text-align: left;
+                    }
+                    </style>""", unsafe_allow_html=True)
+
+        with st.container():
+            data = pd.DataFrame(
+                {
+                    '': ['Bros w/ Benefits', 'CL Warriors'],
+                    'Half 1': [10, 13],
+                    'Half 2': [26, 15],
+                    'Total': [36, 28],
+                }
+            )
+
+            # Center table header and data 
+            s1 = dict(selector='th', props=[('text-align', 'center')])
+            s2 = dict(selector='td', props=[('text-align', 'center')])
+            table = data.style.set_table_styles([s1, s2]).to_html()
+
+            # Hide unique key upon table creation
+            st.markdown("""
+                <style>
+                    table td {
+                            text-align: left;
+                    }
+
+                    table td:nth-child(1) {
+                            display: none
+                    }
+
+                    table th:nth-child(1) {
+                            display: none
+                    }
+                </style>
+            """, unsafe_allow_html=True)
+           
+            st.write("""<style>
+                [data-testid='stVerticalBlock']
+                [data-testid='stVerticalBlockBorderWrapper']:nth-child(3) {
+                    width: 100%;
+                    height: 100%;
+                    display: grid;
+                    justify-content: center;
+                    align-items: start;
+                }
+
+                [data-testid='stVerticalBlock']
+                [data-testid='stVerticalBlockBorderWrapper']:nth-child(3)
+                [data-testid='stVerticalBlock'] {
+                    height: 100%;
+                    display: flex;
+                    align-items: start;
+                }
+
+                [data-testid='stVerticalBlock']
+                [data-testid='stVerticalBlockBorderWrapper']:nth-child(3)
+                [data-testid='stVerticalBlock'] 
+                [data-testid='stElementContainer']:nth-child(2) {
+                    background: blue;
+                    height: 100%;
+                    position: static;
+                    top: 0;
+                }
+
+                [data-testid='stVerticalBlock']
+                [data-testid='stVerticalBlockBorderWrapper']:nth-child(3)
+                [data-testid='stVerticalBlock']
+                [data-testid='stElementContainer']:nth-child(2) 
+                [data-testid='stMarkdown'] {
+                    width: 100%;
+                    height: 100%;
+                    display: grid;
+                    justify-content: center;
+                    align-items: start;
+                }
+                </style>""", unsafe_allow_html=True)
+            st.write(f'{table}', unsafe_allow_html=True)
+
+    def create_home_team_stats(self):
+        # TABLE
+        player_stats_df, shooting_stats_df = collect_data()
+        # Container for tables
+        container = st.container(border=False)
+        with container:
+            # Player tables
+            on = st.toggle('Home Team Heatmap (BwB)')
+            if on:
+                # HEATMAP
+                custom_colors = ['#ffdfbe', '#ffd1ad', '#ffc39b', '#ffb58a' ,'#ffa778', '#ff9967']
+                custom_cmap = ListedColormap(custom_colors)
+                heatmap = player_stats_df.style.format(precision=1).background_gradient(cmap=custom_cmap)
+                st.dataframe(heatmap, width=100000)
+            else:
+                st.dataframe(player_stats_df, width=100000)
+
+    def create_away_team_stats(self):
+        # TABLE
+        player_stats_df, shooting_stats_df = collect_data()
+        # Container for tables
+        container = st.container(border=False)
+        with container:
+            # Player tables
+            on = st.toggle('Away Team Heatmap')
+            if on:
+                # HEATMAP
+                custom_colors = ['#ffdfbe', '#ffd1ad', '#ffc39b', '#ffb58a' ,'#ffa778', '#ff9967']
+                custom_cmap = ListedColormap(custom_colors)
+                heatmap = player_stats_df.style.format(precision=1).background_gradient(cmap=custom_cmap)
+                st.dataframe(heatmap, width=100000)
+            else:
+                st.dataframe(player_stats_df, width=100000)
+
+    def plot_shot_chart(self):
+        # Initialize Court object
+        origin = 'bottom-left'
+        court_type = 'fiba'
+        court = Court(origin=origin)
+        fig, ax = plt.subplots(1, 4)
+
+        # Simulate some data
+        n_pts = 100
+        x_1 = np.random.uniform(0, 94, size=n_pts)
+        y_1 = np.random.uniform(0, 50, size=n_pts)
+
+        x_2 = np.random.uniform(0, 94, size=n_pts)
+        y_2 = np.random.uniform(0, 50, size=n_pts)
+
+        # On the first subplot, plot the data as is
+        court.draw(ax[0], )
+        ax[0].scatter(x_1, y_1, s=5, c='tab:blue')
+        ax[0].scatter(x_2, y_2, s=5, c='tab:orange')
+
+        x_1_hl, y_1_hl = transform(x_1, y_1, fr='h', to='hl', origin=origin, court_type='fiba')
+        x_2_hr, y_2_hr = transform(x_2, y_2, fr='h', to='hr', origin=origin, court_type='fiba')
+        court.draw(ax[1], )
+        ax[1].scatter(x_1_hl, y_1_hl, s=5, c='tab:blue')
+        ax[1].scatter(x_2_hr, y_2_hr, s=5, c='tab:orange')
+
+        # x_1_vd, y_1_vd = transform(x_1_hl, y_1_hl, fr='hl', to='vd', origin=origin, court_type=court_type)
+        # court.draw(ax[2], orientation='vd')
+        # ax[2].scatter(x_1_vd, y_1_vd, s=5, c='tab:blue')
+
+        # x_2_vu, y_2_vu = transform(x_2_hr, y_2_hr, fr='hl', to='vu', origin=origin, court_type=court_type)
+        # court.draw(ax[3], orientation='vu')
+        # ax[3].scatter(x_2_vu, y_2_vu, s=5, c='tab:orange')
 
     def plot_basketball_court(self):
         container_bg = '''
@@ -181,32 +408,162 @@ class GameStatisticsDashboard:
             # Plot court
             st.plotly_chart(fig, use_container_width=True)
 
-    def create_dashboard(self):
-        leading_stats_container = st.container(border=True)
-        left, mid_left, mid_right, right = st.columns(4)
+    def create_team_stats_dataframe(self):
+        col1, col2, col3 = st.columns([2,4,2])
 
-        # Leading Overall Statistics
-        with left:
-            card_1 = st.container(border=True)
-            st.subheader('Top Scorer')
+        with col1:
+            self.display_team_leaders()
 
-        with mid_left:
-            card_2 = st.container(border=True)
-            st.subheader('Most Field Goals Made')
+        with col2:
+            df = pd.DataFrame(
+                {
+                    'Bros w/ Benefits': [
+                        'FG',
+                        'FG %',
+                        '3PT',
+                        '3PT %',
+                        'FT',
+                        'FT %',
+                        'Rebounds',
+                        'OFF Rebounds',
+                        'DEF Rebounds',
+                        'Assists',
+                        'Steals',
+                        'Blocks',
+                        'Turnovers',
+                        'Fouls',
+                    ],
+                    '': [
+                        'FG',
+                        'FG %',
+                        '3PT',
+                        '3PT %',
+                        'FT',
+                        'FT %',
+                        'Rebounds',
+                        'OFF Rebound',
+                        'DEF Rebound',
+                        'Assists',
+                        'Steals',
+                        'Blocks',
+                        'Turnovers',
+                        'Fouls',
+                    ],
+                    'CL Warriors': [
+                        'FG',
+                        'FG %',
+                        '3PT',
+                        '3PT %',
+                        'FT',
+                        'FT %',
+                        'Rebounds',
+                        'OFF Rebounds',
+                        'DEF Rebounds',
+                        'Assists',
+                        'Steals',
+                        'Blocks',
+                        'Turnovers',
+                        'Fouls',
+                    ]
+                }
+            )
+            
+            df_styled = df.style.set_table_styles(
+                [
+                    {
+                        'selector': 'th',
+                        'props': [
+                            ('background-color', '#ffb975'),
+                        ]
+                    },
+                    {
+                        'selector': 'td, th',
+                        'props':[
+                            ('border', 'none'),
+                            ('text-align', 'center'),
+                            ('width', '30%'),
+                            ('height', '30px'),
+                        ]
+                    }
+                ]
+            )
+            
+            st.write(df_styled.to_html(), unsafe_allow_html=True)
 
-        with mid_right:
-            card_3 = st.container(border=True)
-            st.subheader('Most 3PT Field Goals made')
+        with col3:
+            self.display_team_leaders()
 
-        with right:
-            card_4 = st.container(border=True)
-            st.subheader('Free Throw Percentage')
+    def display_team_leaders(self):
+        # TODO: set data to their respective team box scores
+        data = get_team_leader_stats()
+        team_leader_container = st.container()
+        col1, col2 = st.columns(2, gap='large')
 
+        st.write(
+            """
+                <style>
+                    [data-testid="stMetricDelta"] svg {
+                    display: none;
+            }
+                </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        with team_leader_container:
+            with col1:
+                with st.container(border=False):
+                    st.metric(
+                        label='**points**', 
+                        value=f'{data["leading_PTS_stat"]}', 
+                        delta=f'{data["PTS_leader"]}',
+                        delta_color='inverse',
+                    )
+                st.markdown('######')
+                with st.container(border=False):
+                    st.metric(
+                        label='**rebounds**', 
+                        value=f'{data["leading_REB_stat"]}', 
+                        delta=f'{data["REB_leader"]}',
+                        delta_color='inverse',
+                    )
+                st.markdown('######')
+                with st.container(border=False):
+                    st.metric(
+                        label='**steals**', 
+                        value=f'{data["leading_STL_stat"]}', 
+                        delta=f'{data["STL_leader"]}',
+                        delta_color='inverse',
+                    )
+            with col2:
+                with st.container(border=False):
+                    st.metric(
+                        label='**FG%**', 
+                        value=f'{data["leading_FG_stat"]}', 
+                        delta=f'{data["FG_leader"]}',
+                        delta_color='inverse',
+                    )
+                st.markdown('######')
+                with st.container(border=False):
+                    st.metric(
+                        label='**assists**', 
+                        value=f'{data["leading_AST_stat"]}', 
+                        delta=f'{data["AST_leader"]}',
+                        delta_color='inverse',
+                    )
+                st.markdown('######')
+                with st.container(border=False):
+                    st.metric(
+                        label='**blocks**', 
+                        value=f'{data["leading_BLK_stat"]}', 
+                        delta=f'{data["BLK_leader"]}',
+                        delta_color='inverse',
+                    )
+
+        st.markdown('######')
 
 def main():
     game_stats = GameStatisticsDashboard()
-    game_stats.create_sidebar()
-    game_stats.plot_basketball_court()
-    game_stats.create_dashboard()
+
 
 main()
