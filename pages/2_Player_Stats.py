@@ -31,7 +31,6 @@ class PlayerStatisticsDashboard:
         # Uppercase all text
         st.markdown('<style> body { text-transform: uppercase; } </style>', unsafe_allow_html=True)
         with st.container():
-            # self.create_sidebar()
             self.create_dashboard()
 
     def create_sidebar(self):
@@ -106,7 +105,7 @@ class PlayerStatisticsDashboard:
 
         card_theme = {
             # 'background-color': '#f0f1f6',
-            'background-color': '#f8f8f8',
+            'background-color': '#f5f9fa',
             'font-family': 'sans-serif',
             'color': '#252525',
             'border-radius': '.3em',
@@ -116,7 +115,7 @@ class PlayerStatisticsDashboard:
             'padding': '.5em',
             # 'backgroundColor': '#efefef',
             # 'backgroundColor': '#f0f1f6',
-            'backgroundColor': '#f8f8f8',
+            'backgroundColor': '#f5f9fa',
             'backdrop-filter': 'blur(32px)',
             'font-family': 'sans-serif',
             'color': '#252525',
@@ -200,7 +199,7 @@ class PlayerStatisticsDashboard:
             '3p%': 43.2,
         }
 
-        with st.container():
+        with st.container(border=True):
             st.markdown('###### Season Stats')
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
@@ -265,7 +264,7 @@ class PlayerStatisticsDashboard:
             """, unsafe_allow_html=True
             )
 
-        with st.container():
+        with st.container(border=True):
             st.markdown('###### Career Stats')
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
@@ -590,7 +589,6 @@ class PlayerStatisticsDashboard:
 
 def main():
     player_stats = PlayerStatisticsDashboard()
-    # player_stats.create_sidebar()
-    # player_stats.create_dashboard()
+
 
 main()

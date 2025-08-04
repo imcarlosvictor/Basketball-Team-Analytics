@@ -88,7 +88,7 @@ class GameStatisticsDashboard:
             
     def create_game_summary(self):
         with st.container():
-            col1, col2, col3 = st.columns([2,1,2])
+            col1, col2, col3, col4, col5 = st.columns([2,1,2,1,2])
 
             with col1:
                 st.text('Bros w/ Benefits')
@@ -106,9 +106,10 @@ class GameStatisticsDashboard:
                     [data-testid='stVerticalBlock'] 
                     [data-testid='stHorizontalBlock'] 
                     [data-testid='stColumn']:nth-child(1) {
+                        padding-top: 1.5em;
                         display: grid;
                         justify-content: right;
-                        align-items: end;
+                        align-items: center;
                     }
 
                     [data-testid='stVerticalBlockBorderWrapper'] 
@@ -125,21 +126,22 @@ class GameStatisticsDashboard:
                     </style>""", unsafe_allow_html=True)
 
             with col2:
-                st.text('36-28')
+                st.text('36')
                 st.write("""<style>
-                    [data-testid='stVerticalBlock']
-                    [data-testid='stVerticalBlockBorderWrapper']:nth-child(1) {
-                        width: 100%;
-                        # height: 100%;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                    }
+                    # [data-testid='stVerticalBlock']
+                    # [data-testid='stVerticalBlockBorderWrapper']:nth-child(2) {
+                    #     width: 100%;
+                    #     # height: 100%;
+                    #     display: flex;
+                    #     justify-content: center;
+                    #     align-items: center;
+                    # }
 
                     [data-testid='stVerticalBlockBorderWrapper'] 
                     [data-testid='stVerticalBlock'] 
                     [data-testid='stHorizontalBlock'] 
                     [data-testid='stColumn']:nth-child(2) {
+                        padding-top: 1.5em;
                         display: grid;
                         justify-content: center;
                         align-items: end;
@@ -158,10 +160,107 @@ class GameStatisticsDashboard:
                     </style>""", unsafe_allow_html=True)
 
             with col3:
+                with st.container():
+                    data = pd.DataFrame(
+                        {
+                            '': ['Bros w/ Benefits', 'CL Warriors'],
+                            'Half 1': [10, 13],
+                            'Half 2': [26, 15],
+                            'Total': [36, 28],
+                        }
+                    )
+
+                    # Center table header and data 
+                    s1 = dict(selector='th', props=[('text-align', 'center')])
+                    s2 = dict(selector='td', props=[('text-align', 'center')])
+                    table = data.style.set_table_styles([s1, s2]).to_html()
+
+                    # Hide unique key upon table creation
+                    st.markdown("""
+                        <style>
+                            table td {
+                                    text-align: left;
+                            }
+
+                            table td:nth-child(1) {
+                                    display: none
+                            }
+
+                            table th:nth-child(1) {
+                                    display: none
+                            }
+                        </style>
+                    """, unsafe_allow_html=True)
+                
+                    st.write("""<style>
+                        # [data-testid='stVerticalBlock']
+                        # [data-testid='stColumn']:nth-child(3)
+                        # [data-testid='stVerticalBlockBorderWrapper']
+                        # [data-testid='stVerticalBlock'] 
+                        # [data-testid='stVerticalBlockBorderWrapper'] {
+                        #     width: 100%;
+                        #     height: 100%;
+                        #     display: grid;
+                        #     justify-content: center;
+                        #     align-items: center;
+                        # }
+
+                        # [data-testid='stVerticalBlock']
+                        # [data-testid='stVerticalBlockBorderWrapper']:nth-child(3)
+                        # [data-testid='stVerticalBlock'] 
+                        # [data-testid='stElementContainer']:nth-child(3) {
+                        #     background: blue;
+                        #     height: 100%;
+                        #     position: static;
+                        #     top: 0;
+                        # }
+
+                        [data-testid='stVerticalBlock']
+                        [data-testid='stVerticalBlockBorderWrapper']:nth-child(3)
+                        [data-testid='stVerticalBlock']
+                        [data-testid='stElementContainer']:nth-child(3) 
+                        [data-testid='stMarkdown'] {
+                            width: 100%;
+                            height: 100%;
+                            display: grid;
+                            justify-content: center;
+                            align-items: start;
+                        }
+                        </style>""", unsafe_allow_html=True)
+                    st.write(f'{table}', unsafe_allow_html=True)
+                pass
+
+            with col4:
+                st.text('28')
+                st.write("""<style>
+                    [data-testid='stVerticalBlockBorderWrapper'] 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stHorizontalBlock'] 
+                    [data-testid='stColumn']:nth-child(4) {
+                        background red;
+                        padding-top: 1.5em;
+                        display: grid;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    [data-testid='stVerticalBlockBorderWrapper'] 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stHorizontalBlock'] 
+                    [data-testid='stColumn']:nth-child(4) 
+                    [data-testid='stVerticalBlock'] 
+                    [data-testid='stElementContainer']:nth-child(1) 
+                    [data-testid='stText'] {
+                        font-size: 50px;
+                        font-weight: bold;
+                    }
+                    </style>""", unsafe_allow_html=True)
+
+            with col5:
                 st.text('CL Warriors')
                 st.write("""<style>
                     [data-testid='stVerticalBlock']
-                    [data-testid='stVerticalBlockBorderWrapper']:nth-child(1) {
+                    [data-testid='stVerticalBlockBorderWrapper']:nth-child(5) {
                         width: 100%;
                         height: 100%;
                         display: flex;
@@ -172,7 +271,8 @@ class GameStatisticsDashboard:
                     [data-testid='stVerticalBlockBorderWrapper'] 
                     [data-testid='stVerticalBlock'] 
                     [data-testid='stHorizontalBlock'] 
-                    [data-testid='stColumn']:nth-child(3) {
+                    [data-testid='stColumn']:nth-child(5) {
+                        padding-top: 1.5em;
                         display: grid;
                         justify-content: left;
                         align-items: end;
@@ -181,7 +281,7 @@ class GameStatisticsDashboard:
                     [data-testid='stVerticalBlockBorderWrapper'] 
                     [data-testid='stVerticalBlock'] 
                     [data-testid='stHorizontalBlock'] 
-                    [data-testid='stColumn']:nth-child(3) 
+                    [data-testid='stColumn']:nth-child(5) 
                     [data-testid='stVerticalBlock'] 
                     [data-testid='stElementContainer']:nth-child(1) 
                     [data-testid='stText'] {
@@ -190,80 +290,6 @@ class GameStatisticsDashboard:
                         text-align: left;
                     }
                     </style>""", unsafe_allow_html=True)
-
-        with st.container():
-            data = pd.DataFrame(
-                {
-                    '': ['Bros w/ Benefits', 'CL Warriors'],
-                    'Half 1': [10, 13],
-                    'Half 2': [26, 15],
-                    'Total': [36, 28],
-                }
-            )
-
-            # Center table header and data 
-            s1 = dict(selector='th', props=[('text-align', 'center')])
-            s2 = dict(selector='td', props=[('text-align', 'center')])
-            table = data.style.set_table_styles([s1, s2]).to_html()
-
-            # Hide unique key upon table creation
-            st.markdown("""
-                <style>
-                    table td {
-                            text-align: left;
-                    }
-
-                    table td:nth-child(1) {
-                            display: none
-                    }
-
-                    table th:nth-child(1) {
-                            display: none
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-           
-            st.write("""<style>
-                [data-testid='stVerticalBlock']
-                [data-testid='stVerticalBlockBorderWrapper']:nth-child(3) {
-                    width: 100%;
-                    height: 100%;
-                    display: grid;
-                    justify-content: center;
-                    align-items: start;
-                }
-
-                [data-testid='stVerticalBlock']
-                [data-testid='stVerticalBlockBorderWrapper']:nth-child(3)
-                [data-testid='stVerticalBlock'] {
-                    height: 100%;
-                    display: flex;
-                    align-items: start;
-                }
-
-                [data-testid='stVerticalBlock']
-                [data-testid='stVerticalBlockBorderWrapper']:nth-child(3)
-                [data-testid='stVerticalBlock'] 
-                [data-testid='stElementContainer']:nth-child(2) {
-                    background: blue;
-                    height: 100%;
-                    position: static;
-                    top: 0;
-                }
-
-                [data-testid='stVerticalBlock']
-                [data-testid='stVerticalBlockBorderWrapper']:nth-child(3)
-                [data-testid='stVerticalBlock']
-                [data-testid='stElementContainer']:nth-child(2) 
-                [data-testid='stMarkdown'] {
-                    width: 100%;
-                    height: 100%;
-                    display: grid;
-                    justify-content: center;
-                    align-items: start;
-                }
-                </style>""", unsafe_allow_html=True)
-            st.write(f'{table}', unsafe_allow_html=True)
 
     def create_home_team_stats(self):
         # TABLE
@@ -503,8 +529,19 @@ class GameStatisticsDashboard:
             """
                 <style>
                     [data-testid="stMetricDelta"] svg {
-                    display: none;
-            }
+                        display: none;
+                    }
+
+                    [data-testid="stTabs"]
+                    [data-testid="stVerticalBlockBorderWrapper"]
+                    [data-testid="stVerticalBlock"]
+                    [data-testid="stHorizontalBlock"]
+                    [data-testid="stColumn"] {
+                        padding-top: 1.5em;
+                        display: flex;
+                        justify-contents: start;
+                    }
+
                 </style>
             """,
             unsafe_allow_html=True,
