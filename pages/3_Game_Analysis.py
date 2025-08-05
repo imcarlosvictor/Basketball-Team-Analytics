@@ -499,15 +499,16 @@ class GameStatisticsDashboard:
                     {
                         'selector': 'th',
                         'props': [
-                            ('background-color', '#ffb975'),
+                            ('background-color', '#a0bded'),
                         ]
                     },
                     {
                         'selector': 'td, th',
                         'props':[
+                            ('padding', '.8em'),
                             ('border', 'none'),
                             ('text-align', 'center'),
-                            ('width', '30%'),
+                            ('width', '18%'),
                             ('height', '30px'),
                         ]
                     }
