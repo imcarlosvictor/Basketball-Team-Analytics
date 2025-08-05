@@ -11,6 +11,7 @@ from streamlit_extras.stylable_container import stylable_container
 from modules.basketball_court import draw_court
 
 from modules.team_leaders import *
+from modules.shot_chart_details import *
 
 # from mplbasketball import Court
 # from mplbasketball.utils import transform
@@ -44,6 +45,8 @@ class GameStatisticsDashboard:
             self.create_away_team_stats()
         with tab2:
             self.create_team_stats_dataframe()
+        with tab3:
+            create_play_by_play_summary()
 
     def create_filter_search(self):
         with st.container():
@@ -499,7 +502,7 @@ class GameStatisticsDashboard:
                     {
                         'selector': 'th',
                         'props': [
-                            ('background-color', '#a0bded'),
+                            ('background-color', '#c7cbe0'),
                         ]
                     },
                     {
