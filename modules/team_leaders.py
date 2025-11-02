@@ -73,15 +73,22 @@ def create_team_leaders_table():
             <style>
                 [data-testid="stMetricDelta"] svg {
                 display: none;
-        }
+                }
+
+                [data-testid="stTabs"]
+                [data-testid="stVerticalBlockBorderWrapper"]
+                [data-testid="stVerticalBlock"]
+                [data-testid="stHorizontalBlock"]
+                [data-testid="stColumn"] {
+                    display: grid;
+                    background: red;
+                }
             </style>
         """,
         unsafe_allow_html=True,
     )
-
     with leading_stats_container:
         # Leading Overall Statistics
-        st.markdown('###### Game Leaders')
 
         with col_1:
             with st.container(border=False):

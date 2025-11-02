@@ -6,21 +6,20 @@ def create_play_by_play_summary():
     with st.container():
         half_1_df = pd.DataFrame(
             [
-                {'time': '12:34', 'Player': 'Mark', 'Play': '3', 'BWB': '10', 'CLW': '19'},
-                {'time': '12:34', 'Player': 'Mark', 'Play': '3', 'BWB': '10', 'CLW': '19'},
-                {'time': '12:34', 'Player': 'Mark', 'Play': '3', 'BWB': '10', 'CLW': '19'},
-                {'time': '12:34', 'Player': 'Mark', 'Play': '3', 'BWB': '10', 'CLW': '19'},
-                {'time': '12:34', 'Player': 'Mark', 'Play': '3', 'BWB': '10', 'CLW': '19'},
+                {'time': '12:34', 'Player': 'Mark', 'Points': '3', 'BWB': '10', 'CLW': '19'},
+                {'time': '12:34', 'Player': 'Mark', 'Points': '3', 'BWB': '10', 'CLW': '19'},
+                {'time': '12:34', 'Player': 'Mark', 'Points': '3', 'BWB': '10', 'CLW': '19'},
+                {'time': '12:34', 'Player': 'Mark', 'Points': '3', 'BWB': '10', 'CLW': '19'},
+                {'time': '12:34', 'Player': 'Mark', 'Points': '3', 'BWB': '10', 'CLW': '19'},
             ]
         )
 
         half_2_df = pd.DataFrame(
             [
-                {'time': '12:34', 'Player': 'Mark', 'Play': '3', 'BWB': '10', 'CLW': '19'},
-                {'time': '12:34', 'Player': 'Mark', 'Play': '3', 'BWB': '10', 'CLW': '19'},
+                {'time': '12:34', 'Player': 'Mark', 'Points': '3', 'BWB': '10', 'CLW': '19'},
+                {'time': '12:34', 'Player': 'Mark', 'Points': '3', 'BWB': '10', 'CLW': '19'},
             ]
         )
-
 
         tab1, tab2 = st.tabs(['1st Half', '2nd Half'])
         with tab1:
@@ -36,13 +35,13 @@ def style_dataframe(dataframe_to_style):
             {
                 'selector': 'th',
                 'props': [
-                    ('background-color', '#c7cbe0'),
+                    ('background-color', '#e1e9f2'),
                 ]
             },
             {
                 'selector': 'td, th',
                 'props':[
-                    ('padding', '.4em'),
+                    ('padding', '.5em'),
                     ('border', 'none'),
                     ('text-align', 'center'),
                     ('width', '25%'),

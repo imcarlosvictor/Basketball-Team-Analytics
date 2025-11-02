@@ -8,13 +8,12 @@ from PIL import Image
 from utils import court_coordinates as cc
 from matplotlib.colors import ListedColormap
 from streamlit_extras.stylable_container import stylable_container
-from modules.basketball_court import draw_court
+# from modules.basketball_court import draw_court
 
 from modules.team_leaders import *
 from modules.shot_chart_details import *
+# from modules.basketball_court import *
 
-# from mplbasketball import Court
-# from mplbasketball.utils import transform
 
 
 class GameStatisticsDashboard:
@@ -31,8 +30,8 @@ class GameStatisticsDashboard:
 
     def create_game_stat_dashboard(self):
         self.create_filter_search()
-        self.embedded_video_slider()
         self.create_game_summary()
+        self.embedded_video_slider()
         self.create_tabs()
         # self.plot_basketball_court()
         # self.plot_shot_chart()
@@ -40,7 +39,6 @@ class GameStatisticsDashboard:
     def create_tabs(self):
         tab1, tab2, tab3 = st.tabs(['Box Score', 'Team Stats', 'Shot Chart',])
         with tab1:
-            create_team_leaders_table()
             self.create_home_team_stats()
             self.create_away_team_stats()
         with tab2:
@@ -79,8 +77,7 @@ class GameStatisticsDashboard:
                     ),
                     index=None,
                 )
-
-        st.divider()
+        # st.divider()
 
     def embedded_video_slider(self):
         """From filter search, find the video on youtube page."""
@@ -88,9 +85,9 @@ class GameStatisticsDashboard:
         VIDEO_URL = 'https://www.youtube.com/watch?v=ZQ1dfAVO910'
         with st.expander('Game'):
             st.video(VIDEO_URL)
-            
+
     def create_game_summary(self):
-        with st.container():
+        with st.container(border=False):
             col1, col2, col3, col4, col5 = st.columns([2,1,2,1,2])
 
             with col1:
@@ -103,6 +100,7 @@ class GameStatisticsDashboard:
                         display: flex;
                         justify-content: center;
                         align-items: center;
+                        # background: linear-gradient(to right, #EFF4F7 0%, #00f5a7 100%);
                     }
 
                     [data-testid='stVerticalBlockBorderWrapper'] 
@@ -294,6 +292,8 @@ class GameStatisticsDashboard:
                     }
                     </style>""", unsafe_allow_html=True)
 
+        create_team_leaders_table()
+
     def create_home_team_stats(self):
         # TABLE
         player_stats_df, shooting_stats_df = collect_data()
@@ -327,6 +327,166 @@ class GameStatisticsDashboard:
                 st.dataframe(heatmap, width=100000)
             else:
                 st.dataframe(player_stats_df, width=100000)
+
+    def create_team_stats_dataframe(self):
+        col1, col2, col3 = st.columns([1,1,1])
+
+        with col1:
+            self.display_team_leaders('home')
+
+        with col2:
+            df = pd.DataFrame(
+                {
+                    'Bros w/ Benefits': [
+                        'FG',
+                        'FG %',
+                        '3PT',
+                        '3PT %',
+                        'FT',
+                        'FT %',
+                        'Rebounds',
+                        'OFF Rebounds',
+                        'DEF Rebounds',
+                        'Assists',
+                        'Steals',
+                        'Blocks',
+                        'Turnovers',
+                        'Fouls',
+                    ],
+                    '': [
+                        'FG',
+                        'FG %',
+                        '3PT',
+                        '3PT %',
+                        'FT',
+                        'FT %',
+                        'Rebounds',
+                        'OFF Rebound',
+                        'DEF Rebound',
+                        'Assists',
+                        'Steals',
+                        'Blocks',
+                        'Turnovers',
+                        'Fouls',
+                    ],
+                    'CL Warriors': [
+                        'FG',
+                        'FG %',
+                        '3PT',
+                        '3PT %',
+                        'FT',
+                        'FT %',
+                        'Rebounds',
+                        'OFF Rebounds',
+                        'DEF Rebounds',
+                        'Assists',
+                        'Steals',
+                        'Blocks',
+                        'Turnovers',
+                        'Fouls',
+                    ]
+                }
+            )
+            
+            df_styled = df.style.set_table_styles(
+                [
+                    {
+                        'selector': 'th',
+                        'props': [
+                            ('color', '#111111'),
+                            ('background-color', "#e1e9f2"),
+                        ]
+                    },
+                    {
+                        'selector': 'td, th',
+                        'props':[
+                            ('padding', '1em'),
+                            ('border', 'none'),
+                            ('text-align', 'center'),
+                            ('width', 'stretch'),
+                            ('height', '50px'),
+                        ]
+                    }
+                ]
+            )
+            
+            st.write(df_styled.to_html(), unsafe_allow_html=True)
+
+        with col3:
+            self.display_team_leaders('away')
+
+    def display_team_leaders(self, team='home'):
+        # TODO: set data to their respective team box scores
+        data = get_team_leader_stats()
+        team_leader_container = st.container()
+
+        st.write(
+            """
+                <style>
+                    [data-testid="stMetricDelta"] svg {
+                        display: none;
+                    }
+
+                    [data-testid="stTabs"]
+                    [data-testid="stVerticalBlockBorderWrapper"]
+                    [data-testid="stVerticalBlock"]
+                    [data-testid="stHorizontalBlock"]
+                    [data-testid="stColumn"] {
+                    }
+
+                </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        with team_leader_container:
+            with st.container(border=False):
+                st.metric(
+                    label='**points**', 
+                    value=f'{data["leading_PTS_stat"]}', 
+                    delta=f'{data["PTS_leader"]}',
+                    delta_color='inverse',
+                )
+            st.markdown('######')
+            with st.container(border=False):
+                st.metric(
+                    label='**rebounds**', 
+                    value=f'{data["leading_REB_stat"]}', 
+                    delta=f'{data["REB_leader"]}',
+                    delta_color='inverse',
+                )
+            st.markdown('######')
+            with st.container(border=False):
+                st.metric(
+                    label='**steals**', 
+                    value=f'{data["leading_STL_stat"]}', 
+                    delta=f'{data["STL_leader"]}',
+                    delta_color='inverse',
+                )
+            st.markdown('######')
+            with st.container(border=False):
+                st.metric(
+                    label='**FG%**', 
+                    value=f'{data["leading_FG_stat"]}', 
+                    delta=f'{data["FG_leader"]}',
+                    delta_color='inverse',
+                )
+            st.markdown('######')
+            with st.container(border=False):
+                st.metric(
+                    label='**assists**', 
+                    value=f'{data["leading_AST_stat"]}', 
+                    delta=f'{data["AST_leader"]}',
+                    delta_color='inverse',
+                )
+            st.markdown('######')
+            with st.container(border=False):
+                st.metric(
+                    label='**blocks**', 
+                    value=f'{data["leading_BLK_stat"]}', 
+                    delta=f'{data["BLK_leader"]}',
+                    delta_color='inverse',
+                )
 
     def plot_shot_chart(self):
         # Initialize Court object
@@ -437,171 +597,7 @@ class GameStatisticsDashboard:
             # Plot court
             st.plotly_chart(fig, use_container_width=True)
 
-    def create_team_stats_dataframe(self):
-        col1, col2, col3 = st.columns([2,4,2])
 
-        with col1:
-            self.display_team_leaders()
-
-        with col2:
-            df = pd.DataFrame(
-                {
-                    'Bros w/ Benefits': [
-                        'FG',
-                        'FG %',
-                        '3PT',
-                        '3PT %',
-                        'FT',
-                        'FT %',
-                        'Rebounds',
-                        'OFF Rebounds',
-                        'DEF Rebounds',
-                        'Assists',
-                        'Steals',
-                        'Blocks',
-                        'Turnovers',
-                        'Fouls',
-                    ],
-                    '': [
-                        'FG',
-                        'FG %',
-                        '3PT',
-                        '3PT %',
-                        'FT',
-                        'FT %',
-                        'Rebounds',
-                        'OFF Rebound',
-                        'DEF Rebound',
-                        'Assists',
-                        'Steals',
-                        'Blocks',
-                        'Turnovers',
-                        'Fouls',
-                    ],
-                    'CL Warriors': [
-                        'FG',
-                        'FG %',
-                        '3PT',
-                        '3PT %',
-                        'FT',
-                        'FT %',
-                        'Rebounds',
-                        'OFF Rebounds',
-                        'DEF Rebounds',
-                        'Assists',
-                        'Steals',
-                        'Blocks',
-                        'Turnovers',
-                        'Fouls',
-                    ]
-                }
-            )
-            
-            df_styled = df.style.set_table_styles(
-                [
-                    {
-                        'selector': 'th',
-                        'props': [
-                            ('background-color', '#c7cbe0'),
-                        ]
-                    },
-                    {
-                        'selector': 'td, th',
-                        'props':[
-                            ('padding', '.8em'),
-                            ('border', 'none'),
-                            ('text-align', 'center'),
-                            ('width', '18%'),
-                            ('height', '30px'),
-                        ]
-                    }
-                ]
-            )
-            
-            st.write(df_styled.to_html(), unsafe_allow_html=True)
-
-        with col3:
-            self.display_team_leaders()
-
-    def display_team_leaders(self):
-        # TODO: set data to their respective team box scores
-        data = get_team_leader_stats()
-        team_leader_container = st.container()
-        col1, col2 = st.columns(2, gap='large')
-
-        st.write(
-            """
-                <style>
-                    [data-testid="stMetricDelta"] svg {
-                        display: none;
-                    }
-
-                    [data-testid="stTabs"]
-                    [data-testid="stVerticalBlockBorderWrapper"]
-                    [data-testid="stVerticalBlock"]
-                    [data-testid="stHorizontalBlock"]
-                    [data-testid="stColumn"] {
-                        padding-top: 1.5em;
-                        display: flex;
-                        justify-contents: start;
-                    }
-
-                </style>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        with team_leader_container:
-            with col1:
-                with st.container(border=False):
-                    st.metric(
-                        label='**points**', 
-                        value=f'{data["leading_PTS_stat"]}', 
-                        delta=f'{data["PTS_leader"]}',
-                        delta_color='inverse',
-                    )
-                st.markdown('######')
-                with st.container(border=False):
-                    st.metric(
-                        label='**rebounds**', 
-                        value=f'{data["leading_REB_stat"]}', 
-                        delta=f'{data["REB_leader"]}',
-                        delta_color='inverse',
-                    )
-                st.markdown('######')
-                with st.container(border=False):
-                    st.metric(
-                        label='**steals**', 
-                        value=f'{data["leading_STL_stat"]}', 
-                        delta=f'{data["STL_leader"]}',
-                        delta_color='inverse',
-                    )
-            with col2:
-                with st.container(border=False):
-                    st.metric(
-                        label='**FG%**', 
-                        value=f'{data["leading_FG_stat"]}', 
-                        delta=f'{data["FG_leader"]}',
-                        delta_color='inverse',
-                    )
-                st.markdown('######')
-                with st.container(border=False):
-                    st.metric(
-                        label='**assists**', 
-                        value=f'{data["leading_AST_stat"]}', 
-                        delta=f'{data["AST_leader"]}',
-                        delta_color='inverse',
-                    )
-                st.markdown('######')
-                with st.container(border=False):
-                    st.metric(
-                        label='**blocks**', 
-                        value=f'{data["leading_BLK_stat"]}', 
-                        delta=f'{data["BLK_leader"]}',
-                        delta_color='inverse',
-                    )
-
-        st.markdown('######')
 
 def main():
     game_stats = GameStatisticsDashboard()

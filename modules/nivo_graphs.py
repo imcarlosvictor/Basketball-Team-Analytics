@@ -201,6 +201,7 @@ class NivoGraphs:
                     }
                 ]
             )
+
     def radar_graph(self):
         with elements('radar_graph'):
             DATA = [
@@ -253,7 +254,7 @@ class NivoGraphs:
                     }
                 ],
                 theme={
-                    # 'background': '#ececec',
+                    'background': '#0f1014',
                     'textColor': '#252525',
                     'tooltip': {
                         'container': {
